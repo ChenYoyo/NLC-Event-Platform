@@ -5,7 +5,7 @@
     <h1>登入</h1>
 
     <form action="<?php echo $this->baseUrl('login') ?>" method="post">
-         <span>帳號：</span>    <?php echo $this->formText('user-email',
+         <span>電子信箱：</span>    <?php echo $this->formText('user-email',
                                                           ((isset($this->messages['user-email'])) ? $this->messages['user-email'] : null),
                                                                                      array('class' => 'user-email',
                                                                                      'required',

@@ -2,7 +2,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>NLC 民數系統</title>
-  <?php echo $this->headLink()->appendStylesheet('/css/global.css') ?>
+  <?php //echo $this->headLink()->appendStylesheet('/css/global.css') ?>
 </head>
 <body>
 <div id="header" style="background-color: #EEEEEE; height: 30px;">
@@ -10,14 +10,11 @@
         <b>NLC 民數系統</b>
     </div>
     <div id="header-navigation" style="float: right">
-        <a href="<?php echo $this->url(
-            array('controller'=>'guestbook'),
-            'default',
-            true) ?>">登出</a>
+        <?php echo $this->loggedInAs(); ?>
     </div>
 </div>
  
-<?php echo $this->layout()->content ?>
+<?php  echo $this->layout()->content ?>
  
 </body>
 </html>

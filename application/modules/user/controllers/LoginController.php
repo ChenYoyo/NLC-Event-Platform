@@ -12,7 +12,9 @@ class User_LoginController extends Zend_Controller_Action
     {
         $this->_helper->layout->setLayout('user/layout');
     }
-
+    /**
+     * login page : 1. Validation 2. Login process
+     */
     public function indexAction()
     {
     	$passwordValidator = new Zend_Validate();
@@ -41,7 +43,8 @@ class User_LoginController extends Zend_Controller_Action
 
             if ($noValiError) {
             	// login process
-            	$this->_checkAccount($messages['user-email'], $messages['password']);
+            	$this->_checkAccount($post);
+
             	$this->view->messages = $messages;
             } else {
             	$this->view->messages = $messages;
@@ -50,8 +53,9 @@ class User_LoginController extends Zend_Controller_Action
     }
     /**
      * check if email or password exists in database
+     * @param array post data
      */
-    protected function _checkAccount($email, $password)
+    protected function _checkAccount($post)
     {
     	$login = new User_Model_Login();
 
@@ -59,26 +63,55 @@ class User_LoginController extends Zend_Controller_Action
 		$emailStatus = false;
 		$passwordStatus = false;
 
-		if ($login->IsEmailExist($email)) {
-			$emailStatus = true;
+		$adapter = $this->_getAuthAdapter();
+    	
+    	$adapter->setIdentity($post['user-email'])
+    			->setCredential($post['password']);
 
-			if ($login->IsPasswordCorrect($email, $password)) {
-				$passwordStatus = true;
-			} else {
-				$passwordStatus = false;
-			}
-		} else{
-			$emailStatus = false;
-		}
+    	$auth = Zend_auth::getInstance();
+    	$result = $auth->authenticate($adapter);
 
-		if (!$emailStatus) {
-			$this->view->loginStatus = '帳號不存在';
-		} elseif (!$passwordStatus) {
-			$this->view->loginStatus = '密碼錯誤';
-		} else {
-			//login successful
+    	if($result->isValid()){
+    		//login successful
+    		Zend_Session::start();
+    		$user = $adapter->getResultRowObject();
+    		$auth->getStorage()->write($user);
+
+    		$user_session = new Zend_Session_Namespace('Zend_Auth');
+    		$user_session->email = Zend_Auth::getInstance()->getStorage()->read()->email;
+			Zend_Session::rememberMe();
+    		
 			$this->redirect('index/index');
-		}
+    	}else if($result->getCode() == Zend_Auth_Result::FAILURE_IDENTITY_NOT_FOUND){
+    		$this->view->loginStatus = '帳號不存在';
+    	}else if ($result->getCode() == Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID) {
+    		$this->view->loginStatus = '密碼錯誤';
+    	}else {
+			$this->view->loginStatus = '請重新登入';
+    	}
+    }
+
+    /**
+     * 
+     * 
+     * @return mixed authAdapter
+     */
+    protected function _getAuthAdapter()
+    {
+    	$authAdapter = new Zend_Auth_Adapter_DbTable(Zend_Db_Table::getDefaultAdapter());
+		$authAdapter->setTableName('user_account')
+					->setIdentityColumn('email')
+					->setCredentialColumn('password');
+
+		return $authAdapter;
+    }
+    /**
+     * logout action
+     */
+    public function logoutAction()
+    {
+    	Zend_Auth::getInstance()->clearIdentity();
+    	$this->redirect('login/index');
     }
 }
 
