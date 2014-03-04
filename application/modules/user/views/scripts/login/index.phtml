@@ -1,27 +1,36 @@
 <style>
 
 </style>
-<div id="welcome">
+<div id="">
     <h1>登入</h1>
 
-<?php //echo $this->form ?>    
-    <form action="<?php echo $this->baseUrl('login/login') ?>" method="post">
-         <span>帳號：</span>    <?php echo $this->formText('user-email',null , array('class' => 'user-email',
+    <form action="<?php echo $this->baseUrl('login') ?>" method="post">
+         <span>帳號：</span>    <?php echo $this->formText('user-email',
+                                                          ((isset($this->messages['user-email'])) ? $this->messages['user-email'] : null),
+                                                                                     array('class' => 'user-email',
                                                                                      'required',
                                                                                      'placeholder' => 'Email')) ?>
                                                                                      <br>
                                                                                      
-        <?php  if ($this->validatedError['user-email']) {
-                 echo $this->validatedError['user-email'];
+        <?php  if (isset($this->messages['user-emailVali'])) {
+                 echo $this->messages['user-emailVali'];
                  echo '<br>';
         } ?>                                                                                     
                                                                                             
-        <span>密碼：</span> <?php echo $this->formPassword('password', null, array('class' => 'password')) ?>
+        <span>密碼：</span> <?php echo $this->formPassword('password',
+                                                        ((isset($this->messages['password'])) ? $this->messages['password'] : null),
+                                                        array('class' => 'password')) ?>
         <br>
-        <?php  if ($this->validatedError['password']) {
-             echo $this->validatedError['password'];
-             echo '<br>';
-        } ?>
+        <?php  if (isset($this->messages['passwordVali'])) {
+                     echo $this->messages['passwordVali'];
+                     echo '<br>';
+                }
+
+                if (isset($this->loginStatus)) {
+                     echo $this->loginStatus;
+                     echo '<br>';
+                }
+        ?>
         <?php echo $this->formSubmit('submit', '登入', array('class' => 'submit')) ?>
 
     </form >
