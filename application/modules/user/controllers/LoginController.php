@@ -50,6 +50,10 @@ class User_LoginController extends Zend_Controller_Action
             	$this->view->messages = $messages;
             }
         }
+
+        if (Zend_Auth::getInstance()->hasIdentity()) {
+            $this->redirect('index/index');
+        }
     }
     /**
      * check if email or password exists in database

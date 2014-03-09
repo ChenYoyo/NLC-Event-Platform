@@ -1,0 +1,297 @@
+<script src="//code.jquery.com/jquery-1.9.1.js"></script>
+  <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+  
+  
+  <?php echo $this->headScript()->appendFile('/js/datetime-picker/bootstrap-datetimepicker.min.js', 'text/javascript'); ?>
+  <?php echo $this->headScript()->appendFile('/js/datetime-picker/locales/bootstrap-datetimepicker.zh-TW.js', 'text/javascript'); ?>
+  <?php echo $this->headScript()->appendFile('/ckeditor/ckeditor.js', 'text/javascript'); ?>
+  
+  <?php echo $this->headLink()->appendStylesheet('/css/datetime-picker/bootstrap-datetimepicker.min.css') ?>
+  <script>
+                // When the document is ready
+        $(document).ready(function () {
+
+            $("#editEvent").click(function(event) {
+                $("#divEditEvent").show();
+                $("#divEditTicket").hide();
+                $("#divEditForm").hide();
+            });
+
+            $("#editTicket").click(function(event) {
+                $("#divEditEvent").hide();
+                $("#divEditTicket").show();
+                $("#divEditForm").hide();
+            });
+
+            $("#backTicket").click(function(event) {
+                $("#divEditEvent").hide();
+                $("#divEditTicket").show();
+                $("#divEditForm").hide();
+            });
+
+            $("#editForm").click(function(event) {
+                $("#divEditEvent").hide();
+                $("#divEditTicket").hide();
+                $("#divEditForm").show();
+            });
+
+            var today = new Date();
+            var ii = today.getMinutes();
+            var hh = today.getHours();
+            var dd = today.getDate();
+            var mm = today.getMonth() + 1;
+            var yyyy = today.getFullYear();
+
+            if (ii < 10) {
+                ii = '0' + ii;
+            };
+
+            if (hh < 10) {
+                hh = '0' + hh;
+            };
+
+            if (dd < 10) {
+                dd = '0' + dd;
+            }
+
+            if (mm < 10) {
+                mm = '0' + mm;
+            }
+
+            today = yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + ii;
+            // console.log(today);
+            $('.form_datetime').datetimepicker({
+                language:  'zh-TW',
+                weekStart: 1,
+                todayBtn:  1,
+                autoclose: 1,
+                todayHighlight: 1,
+                startView: 2,
+                forceParse: 0,
+                showMeridian: 1,
+                pickerPosition: "bottom-left",
+                startDate: today,
+                minuteStep: 30
+            });  
+        });
+    </script>
+        <form action="<?php echo $this->url(array('module' => 'administration','controller'=>'event','action'=>'create'), null, FALSE); ?>" class="form-signin" role="form" method="post">
+            <div class="container">
+                <div class="row" id="divEditEvent">
+                    <div class="col-cg-6">
+                        <div class="form-group">
+                            <label>活動名稱</label>
+                            <input class="form-control" name="event[activityName]">
+                            <!-- <p class="help-block">Example block-level help text here.</p> -->
+                        </div>
+                        <!-- http://jqueryui.com/datepicker/ -->
+                        <!-- <div><p>Date: <input type="text" id="datepicker"></p><p>Date: <input type="text" id="datepicker"></p></div> -->
+                        <!-- <div class="form-group">
+                         -->    
+                         <!-- <div class="input-daterange" id="datepicker" >活動時間 -->
+                            <!-- http://runnable.com/UmOmQbKV4wpoAAGa/bootstrap-datepicker-example-date-range-from-to-with-%22today%22-button-activated2 -->
+                        
+                               <!--  <input type="text" class="input-small" name="start" />
+                                <span>~</span>
+                                <input type="text" class="input-small" name="end" />
+                            </div>
+                        </div> -->
+                        <div class="form-group">
+                            <label for="dtp_input1" class="col-md-2 control-label">活動開始時間</label>
+                            <div class="input-group date form_datetime col-md-5" data-date="<?php date_default_timezone_set('America/Los_Angeles'); echo date('Y-m-d'); ?>" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_input1">
+                                <input class="form-control" size="16" type="text" value="" readonly>
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                            </div>
+                            <input type="hidden" id="dtp_input1" value="" name="event[start_time]" /><br/>
+                        </div>
+                        <div class="form-group">
+                            <label for="dtp_input2" class="col-md-2 control-label">活動結束時間</label>
+                            <div class="input-group date form_datetime col-md-5" data-date="1979-09-16T05:25:07Z" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_input2">
+                                <input class="form-control" size="16" type="text" value="">
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                            </div>
+                            <input type="hidden" id="dtp_input2" value="" name="event[end_time]" /><br/>
+                        </div>
+                        <!-- <div class="form-group">
+                            <label for="dtp_input1" class="col-md-2 control-label">活動結束時間</label>
+                            <div class="input-group date form_datetime col-md-5" data-date="1979-09-16T05:25:07Z" data-date-format="dd MM yyyy - HH:ii p" data-link-field="dtp_input1">
+                                <input class="form-control" size="16" type="text" value="" readonly>
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                            </div>
+                            <input type="hidden" id="dtp_input1" value="" name="end_time" /><br/>
+                        </div> -->
+                        <div class="form-group">
+                            <label>活動地點</label>
+                            <select class="form-control" name="event[site]">
+                                <option value="1">新生命教會</option>
+                                <option value="2">新莊</option>
+                                <option value="3">其他</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>教室</label>
+                            <select class="form-control input-small" name="event[classroom]">
+                                <option value="1">第一教室</option>
+                                <option value="2">弟一區塊</option>
+                                <option value="3">其他</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label"><strong>*</strong>縣市</label>
+                            <select class="form-control input-small" name="event[county]">
+                                <option value="1">台北</option>
+                                <option value="2">台南</option>
+                                <option value="3">臺中</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>主辦人</label>
+                            <input class="form-control" name="event[host]">
+                        </div>
+                        <div class="form-group">
+                            <label>地址</label>
+                            <input class="form-control" name="event[address]">
+                        </div>
+                        <div class="form-group">
+                            <label>活動人數</label>
+                            <input class="form-control" name="event[capacity]">
+                        </div>
+                        <div class="form-group">
+                            <label>活動分類</label>
+                            <select class="form-control input-small" name="event[category]">
+                                <option value="1">娛樂</option>
+                                <option value="2">職場</option>
+                                <option value="3">生活</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>活動描述</label>
+                            <textarea class="ckeditor" cols="80" id="editor1" name="event[description]" rows="10"></textarea>    
+                        </div>
+                        <div class="form-group">
+                            <label>是否公開活動</label>
+                            <label class="radio-inline">
+                                <input type="radio" name="event[public]" id="optionsRadiosInline1" value="1" checked="">公開
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="event[public]" id="optionsRadiosInline2" value="2">不公開
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>url</label>
+                            <input class="form-control" name="event[url]">
+                        </div>
+                        <button type="button" class="btn btn-default" disabled="disabled">上一步</button>
+                        <button id="editTicket" type="button" class="btn btn-default">下一步</button>
+                    </div>
+                </div>
+                
+                <div class="row" id="divEditTicket" style="display:none;">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>票種</th>
+                          <th>販售時間</th>
+                          <th>價格</th>
+                          <th>數量</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>學生票</td>
+                          <td>2014/08/01~2014/09/05</td>
+                          <td>100</td>
+                          <td>30</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div class="col-cg-6 bg-success">
+                        <div class="form-group">
+                            <label>票種</label>
+                            <input class="form-control" placeholder="例如：一般票、學生票">
+                            <!-- <p class="help-block">Example block-level help text here.</p> -->
+                        </div>
+                        <div class="form-group">
+                            <label>數量</label>
+                            <input class="form-control" placeholder="票種總和不可多於活動參加人數">
+                            <!-- <p class="help-block">Example block-level help text here.</p> -->
+                        </div>
+                        <div class="form-group">
+                            <label>售價</label>
+                            <input class="form-control" placeholder="單張票價">
+                            <!-- <p class="help-block">Example block-level help text here.</p> -->
+                        </div>
+                        <!-- http://jqueryui.com/datepicker/ -->
+                        <!-- <div><p>Date: <input type="text" id="datepicker"></p><p>Date: <input type="text" id="datepicker"></p></div> -->
+                        <!-- <div class="form-group"> -->
+                            <!-- <div class="input-daterange" id="datepicker" >販售時間 -->
+                            <!-- http://runnable.com/UmOmQbKV4wpoAAGa/bootstrap-datepicker-example-date-range-from-to-with-%22today%22-button-activated2 -->
+                        
+                               <!--  <input type="text" class="input-small" name="start" />
+                                <span>~</span>
+                                <input type="text" class="input-small" name="end" />
+                            </div> -->
+                        <!-- </div> -->
+                        <div class="form-group">
+                            <label for="dtp_input3" class="col-md-2 control-label">販售開始時間</label>
+                            <div class="input-group date form_datetime col-md-5" data-date="1979-09-16T05:25:07Z" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_input3">
+                                <input class="form-control" size="16" type="text" value="" readonly>
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                            </div>
+                            <input type="hidden" id="dtp_input3" value="" /><br/>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dtp_input4" class="col-md-2 control-label">販售結束時間</label>
+                            <div class="input-group date form_datetime col-md-5" data-date="1979-09-16T05:25:07Z" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_input4">
+                                <input class="form-control" size="16" type="text" value="" readonly>
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                            </div>
+                            <input type="hidden" id="dtp_input4" value="" /><br/>
+                        </div>
+                        <div class="form-group">
+                            <label>最少訂購數量</label>
+                            <select class="form-control">
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>最多訂購數量</label>
+                            <select class="form-control">
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                            </select>
+                        </div>
+                        <button id="AddTicket" type="button" class="btn btn-default">新增</button>
+                        <button id="cancelTicket" type="button" class="btn btn-default">取消</button>
+                    </div>
+                        <div>
+                            <button id="newTicket" type="button" class="btn btn-default">新增票種</button>
+                        </div>
+                        <button id="editEvent" type="button" class="btn btn-default">上一步</button>
+                        <button id="editForm" type="button" class="btn btn-default">下一步</button>
+                </div>
+                <div class="row" id="divEditForm" style="display:none;">
+                    <div class="col-cg-6">
+                        <div class="form-group">
+                            <label>設定表單</label>
+                            <input class="form-control" placeholder="例如：一般票、學生票">
+                            <!-- <p class="help-block">Example block-level help text here.</p> -->
+                        </div>
+                     
+                        <button id="backTicket" type="button" class="btn btn-default">上一步</button>
+                        <button id="submit" type="submit" class="btn btn-default">完成</button>
+                    </div>
+                </div>
+            </div>
+        </form>

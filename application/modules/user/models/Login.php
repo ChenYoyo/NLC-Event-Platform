@@ -12,7 +12,7 @@ class User_Model_Login extends Zend_Db_Table_Abstract
 	}
 
 	/**
-	 * @return bool
+	 * @return bool True: exist , FALSE: non exist
 	 */
 	public function IsEmailExist($email)
 	{

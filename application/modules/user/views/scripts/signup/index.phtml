@@ -1,0 +1,75 @@
+<style>
+
+</style>
+<div>
+    
+    <form action="<?php echo $this->baseUrl('signup') ?>" class="form-signup" method="post">
+        <h2 class="form-signup-heading">註冊</h2>
+        <span>電子信箱：</span>    <?php echo $this->formText('user-email',
+                                                     ((isset($this->messages['user-email'])) ? $this->messages['user-email'] : null),
+                                                                                array('class' => 'user-email form-control',
+                                                                                'required' => '',
+                                                                                'placeholder' => 'Email')) ?>
+                                                                                <br>
+                                                                                
+            <?php  if (isset($this->error['user-emailVali'])) {
+            echo $this->error['user-emailVali'];
+            echo '<br>';
+            } ?>
+    
+            <span>姓名：</span>    <?php echo $this->formText('name',
+                                                     ((isset($this->messages['name'])) ? $this->messages['name'] : null),
+                                                                                array('class' => 'name form-control',
+                                                                                'required' => '',
+                                                                                'placeholder' => '姓名')) ?>
+                                                                                <br>
+                                                                                
+            <?php  if (isset($this->error['nameVali'])) {
+            echo $this->error['nameVali'];
+            echo '<br>';
+            } ?>                                                                                     
+                                                                                       
+            <span>密碼：</span> <?php echo $this->formPassword('password1',
+                                                   null,
+                                                   array('class' => 'password1 form-control', 'required' => '')) ?>
+            <br>
+            <?php  if (isset($this->error['password1_Vali'])) {
+                echo $this->error['password1_Vali'];
+                echo '<br>';
+           }
+    
+           if (isset($this->loginStatus)) {
+                echo $this->loginStatus;
+                echo '<br>';
+           }
+            ?>
+    
+            <span>確認密碼：</span> <?php echo $this->formPassword('password2',
+                                                   null,
+                                                   array('class' => 'password2 form-control', 'required' => '')) ?>
+            <br>
+            <?php  if (isset($this->error['password2_Vali'])) {
+                echo $this->error['password2_Vali'];
+                echo '<br>';
+           }
+
+                if (isset($this->error['passwordIdentical'])) {
+                echo $this->error['passwordIdentical'];
+                echo '<br>';
+           }
+            ?>
+            <?php echo $this->formCheckbox('agree', NULL, array('class' => 'agree form-control', 'required' => '', 'checked' => (bool)($this->messages['agree']))) ?>
+            <span>我同意<a href="#">服務條款</a>及<a href="#">隱私權政策</a></span>
+            <?php if (isset($this->error['name_Vali'])) {
+                echo $this->error['name_Vali'];
+                echo '<br>'; 
+                }
+                if (isset($this->signupStatus)) {
+                echo $this->signupStatus;
+                echo '<br>';
+           }
+            ?>
+            <?php echo $this->formSubmit('submit', '註冊', array('class' => 'submit form-control')) ?>
+    </form>
+    
+</div>

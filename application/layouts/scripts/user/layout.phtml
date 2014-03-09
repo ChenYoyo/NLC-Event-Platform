@@ -1,20 +1,52 @@
-
+<html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <title>NLC 民數系統</title>
-  <?php //echo $this->headLink()->appendStylesheet('/css/global.css') ?>
+  <title>NLC 活動系統</title>
+  <?php echo $this->headLink()->appendStylesheet('/css/style.css') ?>
+  
+  <?php echo $this->headLink()->appendStylesheet('/css/signup.css') ?>
+  <?php // echo $this->headLink()->appendStylesheet('/css/bootstrap.min.css') ?>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <?php echo $this->headScript()->appendFile('/js/bootstrap.min.js', 'text/javascript'); ?>
 </head>
 <body>
-<div id="header" style="background-color: #EEEEEE; height: 30px;">
-    <div id="header-logo" style="float: left">
-        <b>NLC 民數系統</b>
-    </div>
-    <div id="header-navigation" style="float: right">
-        <?php echo $this->loggedInAs(); ?>
-    </div>
-</div>
- 
-<?php  echo $this->layout()->content ?>
+ <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">NLC 活動系統</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="<?php echo $this->url(array('module' => 'administration','controller'=>'event','action'=>'new'), null, FALSE); ?>">建立活動</a></li>
+            <li><a href="#about">找活動</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><img alt="" src="assets/img/avatar1_small.jpg">
+                <span class="username"><?php echo $this->getLoginStatus('username'); ?></span>
+                <i class="fa fa-angle-down"></i><b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">設定</a></li>
+                  <li class="divider"></li>
+                  <li class="dropdown-header">Nav header</li>
+                  <li><a href="#">Separated link</a></li>
+                  <li><a href="#"><?php echo $this->getLoginStatus(); ?></a></li>
+                </ul>
+              </li>
+          </ul>
+
+        </div><!--/.nav-collapse -->
+        
+      </div>
+    </div> 
+
+<?php   echo $this->layout()->content ?>
  
 </body>
 </html>

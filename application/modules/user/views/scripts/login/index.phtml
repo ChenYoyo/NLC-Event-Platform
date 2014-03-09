@@ -1,14 +1,14 @@
-<style>
+<head>
+    <?php echo $this->headLink()->appendStylesheet('/css/signin.css') ?>
+</head>
 
-</style>
-<div id="">
-    <h1>登入</h1>
-
-    <form action="<?php echo $this->baseUrl('login') ?>" method="post">
+    <div class="container">
+        <form action="<?php echo $this->baseUrl('login') ?>" class="form-signin" role="form" method="post">
+            <h2 class="form-signin-heading">登入</h2>
          <span>電子信箱：</span>    <?php echo $this->formText('user-email',
                                                           ((isset($this->messages['user-email'])) ? $this->messages['user-email'] : null),
-                                                                                     array('class' => 'user-email',
-                                                                                     'required',
+                                                                                     array('class' => 'user-email form-control',
+                                                                                     'required' => '',
                                                                                      'placeholder' => 'Email')) ?>
                                                                                      <br>
                                                                                      
@@ -19,21 +19,19 @@
                                                                                             
         <span>密碼：</span> <?php echo $this->formPassword('password',
                                                         ((isset($this->messages['password'])) ? $this->messages['password'] : null),
-                                                        array('class' => 'password')) ?>
+                                                        array('class' => 'password form-control')) ?>
         <br>
         <?php  if (isset($this->messages['passwordVali'])) {
                      echo $this->messages['passwordVali'];
                      echo '<br>';
                 }
-
+        
                 if (isset($this->loginStatus)) {
                      echo $this->loginStatus;
                      echo '<br>';
                 }
         ?>
-        <?php echo $this->formSubmit('submit', '登入', array('class' => 'submit')) ?>
-
-    </form >
-    
-    
-</div>
+        <?php echo $this->formSubmit('submit', '登入', array('class' => 'submit btn btn-lg btn-primary btn-block')) ?>
+        
+        </form >
+    </div>
