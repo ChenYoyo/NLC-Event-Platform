@@ -3,79 +3,225 @@
   <link rel="stylesheet" href="/resources/demos/style.css">
   <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
   
-  
   <?php echo $this->headScript()->appendFile('/js/datetime-picker/bootstrap-datetimepicker.min.js', 'text/javascript'); ?>
   <?php echo $this->headScript()->appendFile('/js/datetime-picker/locales/bootstrap-datetimepicker.zh-TW.js', 'text/javascript'); ?>
   <?php echo $this->headScript()->appendFile('/ckeditor/ckeditor.js', 'text/javascript'); ?>
   
   <?php echo $this->headLink()->appendStylesheet('/css/datetime-picker/bootstrap-datetimepicker.min.css') ?>
   <script>
-                // When the document is ready
-        $(document).ready(function () {
+    $(document).ready(function () {
 
-            $("#editEvent").click(function(event) {
-                $("#divEditEvent").show();
-                $("#divEditTicket").hide();
-                $("#divEditForm").hide();
-            });
-
-            $("#editTicket").click(function(event) {
-                $("#divEditEvent").hide();
-                $("#divEditTicket").show();
-                $("#divEditForm").hide();
-            });
-
-            $("#backTicket").click(function(event) {
-                $("#divEditEvent").hide();
-                $("#divEditTicket").show();
-                $("#divEditForm").hide();
-            });
-
-            $("#editForm").click(function(event) {
-                $("#divEditEvent").hide();
-                $("#divEditTicket").hide();
-                $("#divEditForm").show();
-            });
-
-            var today = new Date();
-            var ii = today.getMinutes();
-            var hh = today.getHours();
-            var dd = today.getDate();
-            var mm = today.getMonth() + 1;
-            var yyyy = today.getFullYear();
-
-            if (ii < 10) {
-                ii = '0' + ii;
-            };
-
-            if (hh < 10) {
-                hh = '0' + hh;
-            };
-
-            if (dd < 10) {
-                dd = '0' + dd;
-            }
-
-            if (mm < 10) {
-                mm = '0' + mm;
-            }
-
-            today = yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + ii;
-            // console.log(today);
-            $('.form_datetime').datetimepicker({
-                language:  'zh-TW',
-                weekStart: 1,
-                todayBtn:  1,
-                autoclose: 1,
-                todayHighlight: 1,
-                startView: 2,
-                forceParse: 0,
-                showMeridian: 1,
-                pickerPosition: "bottom-left",
-                startDate: today,
-                minuteStep: 30
-            });  
+        $("#editEvent").click(function(event) {
+            $("#divEditEvent").show();
+            $("#divEditTicket").hide();
+            $("#divEditForm").hide();
         });
+
+        $("#editTicket").click(function(event) {
+            $("#divEditEvent").hide();
+            $("#divEditTicket").show();
+            $("#divEditForm").hide();
+        });
+
+        $("#backTicket").click(function(event) {
+            $("#divEditEvent").hide();
+            $("#divEditTicket").show();
+            $("#divEditForm").hide();
+        });
+
+        $("#editForm").click(function(event) {
+            $("#divEditEvent").hide();
+            $("#divEditTicket").hide();
+            $("#divEditForm").show();
+        });
+
+        var today = new Date();
+        var ii    = today.getMinutes();
+        var hh    = today.getHours();
+        var dd    = today.getDate();
+        var mm    = today.getMonth() + 1;
+        var yyyy  = today.getFullYear();
+
+        if (ii < 10) {
+            ii = '0' + ii;
+        };
+
+        if (hh < 10) {
+            hh = '0' + hh;
+        };
+
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+
+        today = yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + ii;
+        
+        $('.form_datetime').datetimepicker({
+            language:  'zh-TW',
+            weekStart: 1,
+            todayBtn:  1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            forceParse: 0,
+            showMeridian: 1,
+            pickerPosition: "bottom-left",
+            startDate: today,
+            minuteStep: 30
+        });
+
+        var id;
+            
+        $('.form_datetime_start_sales').on('hide', function  (event) {
+            var startSalesValue = $('.dtp_startSales').val();
+            var startSalesID = '#dtp_startSales_' + id;
+            // id = $('.table tbody tr').length + 1;
+
+            if ($(startSalesID).length > 0) {
+                // hidden value exists
+                $(startSalesID).val(startSalesValue);
+            } else{
+                $(".saleTimePicker-start").append('<input type="hidden" id="dtp_startSales_' + id + '" name="ticket[' + id + '][sale_start]" value="' + startSalesValue + '" />');
+            }
+        });
+
+        $('.form_datetime_end_sales').on('hide', function  (event) {
+            var endSalesValue = $('.dtp_endSales').val();
+            var endSalesID = '#dtp_endSales_' + id;
+            // id = $('.table tbody tr').length + 1;
+
+            if ($(endSalesID).length > 0) {
+                // hidden value exists
+                $(endSalesID).val(endSalesValue);
+            } else{
+                $(".saleTimePicker-end").append('<input type="hidden" id="dtp_endSales_' + id + '" name="ticket[' + id + '][sale_end]" value="' + endSalesValue + '" />');
+            }
+        });
+
+        $('#newTicket').click(function(event) {
+
+            // id = $('.table tbody tr').length + 1;
+            // console.log('id:' + id);
+            if( $('.table tbody tr td.editTable button:last').attr('id') === undefined) {
+                id = 1;
+            } else {
+                // id = $('.table tbody tr td.editTable button:last').attr('id').slice(11);
+                id++;
+            }
+            console.log('newticket' + id);
+
+            $("div#divEditTicket #spanNewTicket").append('<div class="col-cg-6 bg-success" id="NewTicket_' + id +'">' + 
+                '<div class="form-group">' + 
+                    '<label>票種</label> <input class="form-control" type="text" id="ticc" name="ticket[' + id + '][ticketName]" placeholder="例如：一般票、學生票"></div>' + 
+                '<div class="form-group">' + 
+                    '<label>數量</label> <input class="form-control" name="ticket[' + id + '][quantity]" placeholder="票種總和不可多於活動參加人數"> </div>' + 
+                '<div class="form-group"> <label>售價</label> <input class="form-control" name="ticket[' + id + '][price]" placeholder="單張票價"> </div>' +
+                '<span class="saleTimePicker_' + id + '"></span>' +
+                '<div class="form-group"> <label>最少訂購數量</label> <select class="form-control" name="ticket[' + id + '][min_order]"> <option>1</option> <option>2</option> <option>3</option> </select> </div>' +
+                '<div class="form-group"> <label>最多訂購數量</label> <select class="form-control" name="ticket[' + id + '][max_order]"> <option>1</option> <option>2</option> <option>3</option> </select> </div>' +
+                '<button class="AddTicket" id="AddTicket_' + id + '" type="button" class="btn btn-default">新增</button>' +
+                '<button class="SaveTicket" id="SaveTicket_' + id + '" type="button" style="display:none;" class="btn btn-default">存檔</button>' + 
+                '<button class="DeleteTicket" id="DeleteTicket_' + id + '" type="button" style="display:none;" class="btn btn-default">刪除</button>' + 
+                '<button class="CancelTicket" id="CancelTicket_' + id + '" type="button" class="btn btn-default">取消</button> </div>'
+            );
+                
+            var dom = '.saleTimePicker_' + id;
+            $(".saleTimePicker").appendTo(dom);
+            $(".saleTimePicker").show();
+            $("#newTicket").attr('disabled', true);
+            $(".editTable").attr('disabled', true);
+
+
+        });
+        
+        // AddTicket event
+        $('div#divEditTicket #spanNewTicket').on("click", 'button.AddTicket', function(){
+            var clickID = $(this).attr('id');
+            clickID = clickID.slice(10);
+            var ticketName = $('input[name="' + 'ticket[' + clickID + '][ticketName]' + '"]').val();
+            var quantity   = $('input[name="' + 'ticket[' + clickID + '][quantity]' + '"]').val();
+            var price      = $('input[name="' + 'ticket[' + clickID + '][price]' + '"]').val();
+            var sale_start = $('input[name="' + 'ticket[' + clickID + '][sale_start]' + '"]').val();
+            var sale_end   = $('input[name="' + 'ticket[' + clickID + '][sale_end]' + '"]').val();
+            // var min_order  = $('input[name="' + 'ticket[' + clickID + '][min_order]' + '"]').val();
+            // var max_order  = $('input[name="' + 'ticket[' + clickID + '][max_order]' + '"]').val();
+
+            $('.table-bordered tbody').append('<tr>' +
+                                                    '<td>' + ticketName + '</td>' +
+                                                    '<td>' + sale_start + '~' + sale_end + '</td>' +
+                                                    '<td>' + price + '</td>' +
+                                                    '<td>' + quantity + '</td>' +
+                                                    '<td class="editTable"><button type="button" class="btn btn-default" id="editTicket_' + clickID +'">編輯</button></td>' +
+                                                '</tr>'
+            );
+
+            $("#newTicket").attr('disabled', false);
+            $(".editTable").attr('disabled', false);
+            // $("#SaveTicket_" + clickID).show();
+            // $("#AddTicket_" + clickID).hide();
+            $("#NewTicket_" + clickID).hide();
+        });
+        
+        // CancelTicket event
+        $('div#divEditTicket #spanNewTicket').on("click", 'button.CancelTicket', function(){
+            var clickID = $(this).attr('id');
+            clickID = clickID.slice(13);
+            // console.log('class="CancelTicket:' + clickID);
+            $('#NewTicket_' + clickID).remove();
+            $("#newTicket").attr('disabled', false);
+            $(".editTable").attr('disabled', false);
+
+            id--;
+        });
+
+        // editTicket event
+        $('.table-bordered tbody').on('click', '.editTable button', function(event) {
+            var clickID = $(this).attr('id');
+            clickID = clickID.slice(11);
+            console.log('editTable:' + clickID);
+            event.preventDefault();
+            $("#AddTicket_" + clickID).hide();
+            $("#SaveTicket_" + clickID).show();
+            $("#DeleteTicket_" + clickID).show();
+            $("#CancelTicket_" + clickID).hide();
+            $('#NewTicket_' + clickID).show();
+            $("#newTicket").attr('disabled', true);
+            $(".editTable").attr('disabled', true);
+        });
+
+        // SaveTicket event
+        $('div#divEditTicket #spanNewTicket').on('click', 'button.SaveTicket', function(event) {
+            var clickID = $(this).attr('id');
+
+            clickID = clickID.slice(11);
+            $('#NewTicket_' + clickID).hide();
+            $("#newTicket").attr('disabled', false);
+            $(".editTable").attr('disabled', false);
+        });
+
+        // DeleteTicket event
+        $('div#divEditTicket #spanNewTicket').on('click', 'button.DeleteTicket', function(event) {
+            var clickID = $(this).attr('id');
+            clickID = clickID.slice(13);
+            console.log('DeleteTicket:' + clickID);
+            $('#NewTicket_' + clickID).remove();
+            $("#newTicket").attr('disabled', false);
+            $(".editTable").attr('disabled', false);
+        });
+
+        var numberOfRows = $("div#divEditTicket .table-bordered>tbody>tr").length;
+        console.log(numberOfRows);
+        $("div#divEditTicket .table-bordered>tbody").bind("DOMSubtreeModified", function() {
+            if($("div#divEditTicket .table-bordered>tbody>tr").length !== numberOfRows){
+                numberOfRows = $("div#divEditTicket .table-bordered>tbody>tr").length;
+                console.log('numberOfRows:' + numberOfRows);
+            }
+        });
+    });
     </script>
         <form action="<?php echo $this->url(array('module' => 'administration','controller'=>'event','action'=>'create'), null, FALSE); ?>" class="form-signin" role="form" method="post">
             <div class="container">
@@ -84,7 +230,6 @@
                         <div class="form-group">
                             <label>活動名稱</label>
                             <input class="form-control" name="event[activityName]">
-                            <!-- <p class="help-block">Example block-level help text here.</p> -->
                         </div>
                         <!-- http://jqueryui.com/datepicker/ -->
                         <!-- <div><p>Date: <input type="text" id="datepicker"></p><p>Date: <input type="text" id="datepicker"></p></div> -->
@@ -199,87 +344,41 @@
                           <th>販售時間</th>
                           <th>價格</th>
                           <th>數量</th>
+                          <th>編輯</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td>學生票</td>
-                          <td>2014/08/01~2014/09/05</td>
-                          <td>100</td>
-                          <td>30</td>
-                        </tr>
+                        
                       </tbody>
                     </table>
-                    <div class="col-cg-6 bg-success">
-                        <div class="form-group">
-                            <label>票種</label>
-                            <input class="form-control" placeholder="例如：一般票、學生票">
-                            <!-- <p class="help-block">Example block-level help text here.</p> -->
-                        </div>
-                        <div class="form-group">
-                            <label>數量</label>
-                            <input class="form-control" placeholder="票種總和不可多於活動參加人數">
-                            <!-- <p class="help-block">Example block-level help text here.</p> -->
-                        </div>
-                        <div class="form-group">
-                            <label>售價</label>
-                            <input class="form-control" placeholder="單張票價">
-                            <!-- <p class="help-block">Example block-level help text here.</p> -->
-                        </div>
-                        <!-- http://jqueryui.com/datepicker/ -->
-                        <!-- <div><p>Date: <input type="text" id="datepicker"></p><p>Date: <input type="text" id="datepicker"></p></div> -->
-                        <!-- <div class="form-group"> -->
-                            <!-- <div class="input-daterange" id="datepicker" >販售時間 -->
-                            <!-- http://runnable.com/UmOmQbKV4wpoAAGa/bootstrap-datepicker-example-date-range-from-to-with-%22today%22-button-activated2 -->
-                        
-                               <!--  <input type="text" class="input-small" name="start" />
-                                <span>~</span>
-                                <input type="text" class="input-small" name="end" />
-                            </div> -->
-                        <!-- </div> -->
-                        <div class="form-group">
-                            <label for="dtp_input3" class="col-md-2 control-label">販售開始時間</label>
-                            <div class="input-group date form_datetime col-md-5" data-date="1979-09-16T05:25:07Z" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_input3">
-                                <input class="form-control" size="16" type="text" value="" readonly>
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                    <span id="spanNewTicket">
+                        <span class="saleTimePicker" style="display:none;">
+                            <div class="form-group saleTimePicker-start">
+                                <label for="dtp_startSales" class="col-md-2 control-label">販售開始時間</label>
+                                <div class="input-group date form_datetime form_datetime_start_sales col-md-5" data-date="1979-09-16T05:25:07Z" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_startSales" id="Div_dtp_startSales">
+                                    <input class="form-control" size="16" type="text" value="" readonly>
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                </div>
+                                <input type="hidden" class="dtp_startSales" id="dtp_startSales" value="" /><br/>
                             </div>
-                            <input type="hidden" id="dtp_input3" value="" /><br/>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="dtp_input4" class="col-md-2 control-label">販售結束時間</label>
-                            <div class="input-group date form_datetime col-md-5" data-date="1979-09-16T05:25:07Z" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_input4">
-                                <input class="form-control" size="16" type="text" value="" readonly>
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                                    
+                            <div class="form-group saleTimePicker-end">
+                                <label for="dtp_endSales" class="col-md-2 control-label">販售結束時間</label>
+                                <div class="input-group date form_datetime form_datetime_end_sales col-md-5" data-date="1979-09-16T05:25:07Z" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_endSales" id="Div_dtp_endSales">
+                                    <input class="form-control" size="16" type="text" value="" readonly>
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                </div>
+                                <input type="hidden" class="dtp_endSales" id="dtp_endSales" value="" /><br/>
                             </div>
-                            <input type="hidden" id="dtp_input4" value="" /><br/>
-                        </div>
-                        <div class="form-group">
-                            <label>最少訂購數量</label>
-                            <select class="form-control">
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>最多訂購數量</label>
-                            <select class="form-control">
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                            </select>
-                        </div>
-                        <button id="AddTicket" type="button" class="btn btn-default">新增</button>
-                        <button id="cancelTicket" type="button" class="btn btn-default">取消</button>
+                        </span>
+                    </span>
+                    <div>
+                        <button id="newTicket" type="button" class="btn btn-default">新增票種</button>
                     </div>
-                        <div>
-                            <button id="newTicket" type="button" class="btn btn-default">新增票種</button>
-                        </div>
-                        <button id="editEvent" type="button" class="btn btn-default">上一步</button>
-                        <button id="editForm" type="button" class="btn btn-default">下一步</button>
+                    <button id="editEvent" type="button" class="btn btn-default">上一步</button>
+                    <button id="editForm" type="button" class="btn btn-default">下一步</button>
                 </div>
                 <div class="row" id="divEditForm" style="display:none;">
                     <div class="col-cg-6">
@@ -294,4 +393,4 @@
                     </div>
                 </div>
             </div>
-        </form>
+        </form>;
