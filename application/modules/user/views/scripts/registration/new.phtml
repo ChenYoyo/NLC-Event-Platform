@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<?php date_default_timezone_set('Asia/Taipei'); ?>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <h1><?php echo $this->event['name'] ?></h1>
+
+                </p>
+                <hr>
+                <p>
+                    <span class="glyphicon glyphicon-time"></span><?php echo date("Y-m-d H:i", strtotime($this->event['start_time'])) . '~' . date("Y-m-d H:i", strtotime($this->event['end_time'])) ?>
+                </p>
+                <hr>
+                <img src="http://placehold.it/900x300" class="img-responsive">
+                <hr>
+                <?php echo $this->event['description'] ?>
+
+                <hr>
+
+                <form action="<?php echo $this->baseUrl('registration/order') ?>" method="post">
+                    <h4>票券資訊</h4>
+                    <table class="table table-bordered">
+                    	<thead>
+                    		<tr>
+                    			<th>票種</th>
+                    			<th>販售時間</th>
+                    			<th>價格</th>
+                    			<th>數量</th>
+                    		</tr>
+                    	</thead>
+                    	<tbody>
+                    		<?php
+                    			foreach ($this->tickets as $ticket):
+                    				
+                    				$options = array();
+                    				for ($value=0; $value <= $ticket['max_order'] ; $value++) { 
+                    					$options[$value] = $value;
+                    				}
+                    		?>
+                    			<tr>
+                    				<td><?php echo $ticket['ticketName'] ?></td>
+                    				<td><?php echo date("Y-m-d H:i", strtotime($ticket['sale_start'])) . '~' . date("Y-m-d H:i", strtotime($ticket['sale_end'])) ?></td>
+                    				<td><?php echo $ticket['price'] ?></td>
+                    				<td><?php echo $this->formSelect('ticket[' . $ticket['ticket_sn'] .']', 0, array('class' => 'form-control'), $options); ?>
+                    				</td>
+                    			</tr>
+                    		<?php endforeach ?>
+                    	</tbody>
+                    </table>
+                    <button type="submit" class="btn btn-primary">報名</button>
+                </form>
+                <div class="well">
+                    <h4>Leave a Comment:</h4>
+                    <form role="form">
+                        <div class="form-group">
+                            <textarea class="form-control" rows="3"></textarea>
+                        </div>
+                        <button type="button" class="btn btn-primary">報名</button>
+                    </form>
+                </div>
+
+                <hr>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="well">
+                    <h4>活動地址</h4>
+                    <p>  <a href="http://maps.google.com.tw/maps?hl=zh-TW&q=<?php echo $this->event['county'] ?><?php echo $this->event['address'] ?>" target="_blank"><?php echo $this->event['address'] ?></a></p>
+                    <!-- <div class="input-group">
+                        <input type="text" class="form-control">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </span>
+                    </div> -->
+                    <!-- /input-group -->
+                </div>
+                <!-- /well -->
+                <div class="well">
+                    <h4>Popular Blog Categories</h4>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ul class="list-unstyled">
+                                <li><a href="#dinosaurs">Dinosaurs</a>
+                                </li>
+                                <li><a href="#spaceships">Spaceships</a>
+                                </li>
+                                <li><a href="#fried-foods">Fried Foods</a>
+                                </li>
+                                <li><a href="#wild-animals">Wild Animals</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <ul class="list-unstyled">
+                                <li><a href="#alien-abductions">Alien Abductions</a>
+                                </li>
+                                <li><a href="#business-casual">Business Casual</a>
+                                </li>
+                                <li><a href="#robots">Robots</a>
+                                </li>
+                                <li><a href="#fireworks">Fireworks</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- /well -->
+                <div class="well">
+                    <h4>Side Widget Well</h4>
+                    <p>Bootstrap's default wells work great for side widgets! What is a widget anyways...?</p>
+                </div>
+                <!-- /well -->
+            </div>
+        </div>
+
+        <hr>
+
+        <footer>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>Copyright &copy; Company 2013</p>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+    <!-- /.container -->
+</body>
+
+</html>
