@@ -2,15 +2,9 @@
 <html>
 <?php date_default_timezone_set('Asia/Taipei'); ?>
 <body>
-
-    
-
     <div class="container">
-
         <div class="row">
             <div class="col-lg-8">
-
-
                 <h1><?php echo $this->event['name'] ?></h1>
 
                 </p>
@@ -18,7 +12,7 @@
                 <p>
                     <span class="glyphicon glyphicon-time"></span><?php echo date("Y-m-d H:i", strtotime($this->event['start_time'])) . '~' . date("Y-m-d H:i", strtotime($this->event['end_time'])) ?>
                 </p>
-                
+                <form method="post" action="<?php echo $this->formActionUrl('confirm', null, null, array('event' => $this->params)) ?>">    
                 <h3>訂單資訊</h3>
                 <table class="table table-bordered">
                     <thead>
@@ -29,38 +23,173 @@
                         </tr>
                     </thead>
                     <tbody>
-                                            <?php $totalTickets = 0 ?>
+                        <?php 
+                            $totalTickets = 0; 
+                            $i = 0;
+                        ?>
                         <?php foreach ($this->orders as $order): ?>
+                            <?php echo $this->formHidden('sn[' . $i . ']', $order['ticket_sn']) ?>
+                            <?php echo $this->formHidden('quantity[' . $i . ']', $order['quantity']) ?>
+                            <?php $i++; ?>
                             <tr>
                                 <td><?php echo $order['name'] ?></td>
-                                <td><?php echo $order['price'] . 'x' . $order['quantity'] ?></td>
+                                <td><?php echo $order['price'] . ' x ' . $order['quantity'] ?></td>
                                 <td><?php echo $order['total']; 
-                                                            $totalTickets += $order['total'];
-                                                        ?></td>
+                                        $totalTickets += $order['total'];
+                                    ?></td>
                             </tr>
                         <?php endforeach ?>
-                                                <tr>
-                                                    <th colspan="2">總金額</th>
-                                                    <th><?php echo $totalTickets ?></th>
-                                                </tr>
+                            <tr>
+                                <th colspan="2">總金額</th>
+                                <th><?php echo $totalTickets ?></th>
+                            </tr>
                     </tbody>
                 </table>
-                
-                <div class="well">
-                    <h4>Leave a Comment:</h4>
-                    
-                        <div class="form-group">
-                            <textarea class="form-control" rows="3"></textarea>
-                        </div>
-                        
-                </div>  
-                        <button type="submit" class="btn btn-primary">報名</button>
-                    </form>
+                <table class="table table-bordered">
+                        <tr>
+                            <th>欄位</th>
+                            <th>表格</th>
+                        </tr>
+                        <tbody>
+                            <?php if ($this->required['name']): ?>
+                                <tr>
+                                    <td>姓名</td>
+                                    <td>
+                                        <?php 
+                                            echo $this->formText('form[name]',
+                                                               (isset($this->user_account->username)) ? $this->user_account->username : null,
+                                                                array('class' => 'form-control', 'placeholder' => '姓名', 'required' => 'required')
+                                                        )
+                                         ?>
+                                    </td>
+                                </tr>    
+                            <?php endif ?>
+                            <?php if ($this->required['email']): ?>
+                                <tr>
+                                    <td>Email</td>
+                                    <td>
+                                        <?php 
+                                            echo $this->formText('form[email]',
+                                                                (isset($this->user_account->email)) ? $this->user_account->email : null,
+                                                                array('class' => 'form-control', 'placeholder' => 'email', 'required' => 'required')
+                                                        )
+                                         ?>
+                                    </td>
+                                </tr>    
+                            <?php endif ?>
+                            <?php if ($this->required['phone']): ?>
+                                <tr>
+                                    <td>電話</td>
+                                    <td>
+                                        <?php 
+                                            echo $this->formText('form[phone]',
+                                                                (isset($this->user_account->phone)) ? $this->user_account->phone : null,
+                                                                array('class' => 'form-control', 'placeholder' => '09xx123456', 'required' => 'required')
+                                                        )
+                                         ?>
+                                    </td>
+                                </tr>    
+                            <?php endif ?>
+                            <?php if ($this->required['beneficiary']): ?>
+                                <tr>
+                                    <td>受益人</td>
+                                    <td>
+                                        <?php 
+                                            echo $this->formText('form[beneficiary]',
+                                                                                null,
+                                                                array('class' => 'form-control', 'placeholder' => '', 'required' => 'required')
+                                                        )
+                                         ?>
+                                    </td>
+                                </tr>    
+                            <?php endif ?>
+                            <?php if ($this->required['ID']): ?>
+                                <tr>
+                                    <td>身份證字號</td>
+                                    <td>
+                                        <?php 
+                                            echo $this->formText('form[ID]',
+                                                                                null,
+                                                                array('class' => 'form-control', 'placeholder' => '', 'required' => 'required')
+                                                        )
+                                         ?>
+                                    </td>
+                                </tr>    
+                            <?php endif ?>
+                            <?php if ($this->required['birthday']): ?>
+                                <tr>
+                                    <td>
+                                        生日
+                                    </td>
+                                    <td>
+                                        <div class="form-group form-inline">
+                                            <label class="control-label">西元</label>
+                                            <input class="form-control" name="year" required>
+                                            <label class="control-label">年</label>
+                                            <input class="form-control" name="month" required>
+                                            <label class="control-label">月</label>
+                                            <input class="form-control" name="day" required>
+                                            <label class="control-label">日</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                             <?php endif ?> 
+                            <?php if ($this->required['gender']): ?>
+                                <tr>
+                                    <td>
+                                        性別
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <?php echo $this->formSelect('form[gender]', 1, array('class' => 'form-control', 'required' => 'required'), array(1 => '--', 2 => '男', 3 =>'女')) ?>
+                                        </div>
+                                    </td>
+                                </tr>    
+                            <?php endif ?>
+                            <?php if ($this->required['group']): ?>
+                                <tr>
+                                    <td>
+                                        牧區
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <?php echo $this->formSelect('groups', 0, array('class' => 'form-control', 'required' => 'required'), $this->groups) ?>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endif ?>
+                            <?php if ($this->required['food']): ?>
+                                <tr>
+                                    <td>
+                                        飲食
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <?php echo $this->formSelect('form[food]', 1, array('class' => 'form-control', 'required' => 'required'), array(1 => '--', 2 => '葷食', 3 =>'素食', 4 => '不訂便當')) ?>
+                                        </div>
+                                    </td>
+                                </tr>    
+                            <?php endif ?>
+                            <?php if ($this->required['other']): ?>
+                                <tr>
+                                    <td>
+                                        其他事項
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <textarea cols="80" class="form-control" required rows="10" form="other"></textarea>
+                                        </div>
+                                    </td>
+                                </tr>    
+                            <?php endif ?>
+                            
+                        </tbody>
+                    </table>
+                  
+                    <button type="submit" class="btn btn-primary">確認報名</button>
+                </form>
 
                 <hr>
-
-                
-
             </div>
 
             <div class="col-lg-4">

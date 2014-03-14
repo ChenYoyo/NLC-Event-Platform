@@ -19,7 +19,7 @@
 
                 <hr>
 
-                <form action="<?php echo $this->baseUrl('registration/order') ?>" method="post">
+                <form action="<?php echo $this->formActionUrl('order', null, null, array('event' => $this->params)) ?>" method="post">
                     <h4>票券資訊</h4>
                     <table class="table table-bordered">
                     	<thead>

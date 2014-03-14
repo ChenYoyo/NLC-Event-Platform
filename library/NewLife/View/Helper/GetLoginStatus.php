@@ -1,4 +1,8 @@
 <?php
+/**
+ * @param $param use username or status as param to get the login or logout url
+ *  
+ */
 class NewLife_View_Helper_GetLoginStatus extends Zend_View_Helper_Abstract 
 {
     /**

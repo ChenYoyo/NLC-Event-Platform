@@ -43,8 +43,9 @@ class Administration_EventController extends Zend_Controller_Action
         if ($request->isPost()) {
             $post = $request->getPost();
             $db = $this->_getDB();
+            
+            // handle $_POST[event]
             $data = array();
-
             foreach ($post['event'] as $key => $value) {
                 if (($key != 'activityName') &&
                     ($key != 'url') &&
@@ -75,7 +76,8 @@ class Administration_EventController extends Zend_Controller_Action
             $event_fk = $db->lastInsertId('event', 'event_sn');
             $user_account_sn = Zend_Auth::getInstance()->getIdentity()->user_account_sn;
             $db->insert('user_event', array('user_account_fk' => $user_account_sn, 'event_fk' => $event_fk));            
-
+            
+            // handle $_POST['ticket']
             $data = array();
             foreach ($post['ticket'] as $id => $columns) {
                 foreach ($columns as $column => $value) {
@@ -94,6 +96,16 @@ class Administration_EventController extends Zend_Controller_Action
             }
 
             $db->commit();
+
+            unset($data);
+
+            $data = array();
+            foreach ($post['form'] as $column => $value) {
+                $data[$column] = $value;
+            }
+            $data['event_fk'] = $event_fk;
+
+            $db->insert('required_form', $data);
         }
         
         $this->redirect('index/index');
@@ -137,7 +149,7 @@ class Administration_EventController extends Zend_Controller_Action
         
         $result = array();
         array_push($result, $name, $email, $phone, $beneficiary, $IDcard);
-        
+
         return $result;
     }
 }

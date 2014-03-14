@@ -10,7 +10,7 @@ class Administration_Model_Event extends Zend_Db_Table_Abstract
 	 * @author Yoyo
 	 * @param $url get event,ticket DB data by "event url"
 	 */
-	public function getEventByUrl($url)
+	public function getEventDataByUrl($url)
 	{
 		$select = $this->getAdapter()
 						->select()
@@ -27,6 +27,17 @@ class Administration_Model_Event extends Zend_Db_Table_Abstract
 						->where('event.url = ?', $url);
 		
 		return $this->getAdapter()->fetchAll($select);
+	}
+
+	public function getRequiredSetByUrl($url)
+	{
+		$select = $this->getAdapter()
+						->select()
+						->from($this->_name, array('eventName' => 'name'))
+						->join('required_form', 'event.event_sn = required_form.event_fk')
+						->where('event.url = ?', $url);
+
+		return $this->getAdapter()->fetchRow($select);
 	}
 }
  ?>
