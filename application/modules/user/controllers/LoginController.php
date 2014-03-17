@@ -71,7 +71,8 @@ class User_LoginController extends Zend_Controller_Action
     	
     	$adapter->setIdentity($post['user-email'])
     			->setCredential($post['password']);
-
+                
+        require_once APPLICATION_PATH . '/../library/Zend/Auth.php';
     	$auth = Zend_auth::getInstance();
     	$result = $auth->authenticate($adapter);
 
