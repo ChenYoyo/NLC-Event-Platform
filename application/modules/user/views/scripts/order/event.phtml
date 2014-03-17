@@ -1,0 +1,106 @@
+
+<h1>訂票內容</h1>
+<a href="<?php echo $this->formActionUrl('new', 'registration', null, array('event' => $this->orderData[0]['url'])) ?>">回活動頁面</a>
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>票種</th>
+			<th>數量</th>
+			<th>價格</th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php $totalPrice = 0; ?>
+		<?php foreach ($this->orderData as $data): ?>
+		<tr>
+			<td><?php echo $data['ticket_name'] ?></td>
+			<td><?php echo $data['quantity'] ?></td>
+			<td><?php echo $data['price'] * $data['quantity']; ?></td>
+			<?php $totalPrice += $data['price'] * $data['quantity']; ?>
+		</tr>
+		<?php endforeach ?>
+		<tr>
+			<td colspan="2">總金額</td>
+			<td><?php echo $totalPrice ?></td>
+		</tr>
+	</tbody>
+</table>
+<h1>報名資料</h1>
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>欄位</th>
+			<th>資料</th>
+		</tr>
+	</thead>
+	<?php if (isset($this->orderData[0]['name']) &&
+					$this->orderData[0]['name'] != NULL): ?>
+		<tr>
+			<td>姓名</td>
+			<td><?php echo $this->orderData[0]['name'] ?></td>
+		</tr>
+	<?php endif ?>
+	<?php if (isset($this->orderData[0]['email']) &&
+					$this->orderData[0]['email'] != NULL): ?>
+		<tr>
+			<td>Email</td>
+			<td><?php echo $this->orderData[0]['email'] ?></td>
+		</tr>
+	<?php endif ?>
+	<?php if (isset($this->orderData[0]['gender']) &&
+					$this->orderData[0]['gender'] != NULL): ?>
+		<tr>
+			<td>性別</td>
+			<td><?php echo $this->orderData[0]['gender'] ?></td>
+		</tr>
+	<?php endif ?>
+	<?php if (isset($this->orderData[0]['phone']) &&
+					$this->orderData[0]['phone'] != NULL): ?>
+			<tr>
+				<td>電話</td>
+				<td><?php echo $this->orderData[0]['phone'] ?></td>
+			</tr>
+	<?php endif ?>
+	<?php if (isset($this->orderData[0]['ID']) &&
+					$this->orderData[0]['ID'] != NULL): ?>
+			<tr>
+				<td>身份證字號</td>
+				<td><?php echo $this->orderData[0]['ID'] ?></td>
+			</tr>
+	<?php endif ?>
+	<?php if (isset($this->orderData[0]['beneficiary']) &&
+					$this->orderData[0]['beneficiary'] != NULL): ?>
+			<tr>
+				<td>受益人</td>
+				<td><?php echo $this->orderData[0]['beneficiary'] ?></td>
+			</tr>
+	<?php endif ?>
+	<?php if (isset($this->orderData[0]['groups_name']) &&
+					$this->orderData[0]['groups_name'] != NULL): ?>
+			<tr>
+				<td>牧區</td>
+				<td><?php echo $this->orderData[0]['groups_name'] ?></td>
+			</tr>
+	<?php endif ?>
+	<?php if (isset($this->orderData[0]['food']) &&
+					$this->orderData[0]['food'] != NULL): ?>
+			<tr>
+				<td>飲食</td>
+				<td><?php echo $this->orderData[0]['food'] ?></td>
+			</tr>
+	<?php endif ?>
+	<?php if (isset($this->orderData[0]['birthday_fk']) &&
+					$this->orderData[0]['birthday_fk'] != NULL): ?>
+			<tr>
+				<td>出生日期</td>
+				<td><?php echo '西元 ' . $this->orderData[0]['year'] . ' 年 ' . $this->orderData[0]['month_fk'] . ' 月 ' . $this->orderData[0]['day_fk'] . '日'?></td>
+			</tr>
+	<?php endif ?>
+	<?php if (isset($this->orderData[0]['other']) &&
+					$this->orderData[0]['other'] != NULL): ?>
+			<tr>
+				<td>其他</td>
+				<td><?php echo $this->orderData[0]['other'] ?></td>
+			</tr>
+	<?php endif ?>
+</table>

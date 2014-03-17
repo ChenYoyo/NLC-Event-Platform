@@ -1,0 +1,26 @@
+<h1>我的活動清單</h1>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>編號</th>
+            <th>活動名稱</th>
+            <th>狀態</th>
+            <th>報名時間</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->orders as $order): ?>
+        <tr>
+            <td><a href="<?php echo $this->formActionUrl('event', 'order', null, array('id' => $order['order_id'])) ?>">
+                <?php echo $order['event_sn'] ?>
+                </a>
+            </td>
+            <td><a href="<?php echo $this->formActionUrl('new', 'registration', null, array('event' => $order['url'])) ?>"><?php echo $order['event_name'] ?>
+                </a>
+            </td>
+            <td><?php echo $order['status'] ?></td>
+            <td><?php echo $order['start_time'] ?></td>
+        </tr>
+        <?php endforeach ?>
+    </tbody>
+</table>

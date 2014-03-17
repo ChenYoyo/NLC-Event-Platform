@@ -24,7 +24,7 @@
                     </thead>
                     <tbody>
                         <?php 
-                            $totalTickets = 0; 
+                            $totalPrice = 0; 
                             $i = 0;
                         ?>
                         <?php foreach ($this->orders as $order): ?>
@@ -35,13 +35,13 @@
                                 <td><?php echo $order['name'] ?></td>
                                 <td><?php echo $order['price'] . ' x ' . $order['quantity'] ?></td>
                                 <td><?php echo $order['total']; 
-                                        $totalTickets += $order['total'];
+                                        $totalPrice += $order['total'];
                                     ?></td>
                             </tr>
                         <?php endforeach ?>
                             <tr>
                                 <th colspan="2">總金額</th>
-                                <th><?php echo $totalTickets ?></th>
+                                <th><?php echo $totalPrice ?></th>
                             </tr>
                     </tbody>
                 </table>

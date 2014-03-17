@@ -34,8 +34,10 @@
                 <ul class="dropdown-menu">
                   <li><a href="#">設定</a></li>
                   <li class="divider"></li>
-                  <li class="dropdown-header">Nav header</li>
-                  <li><a href="#">Separated link</a></li>
+                  <li><a href="#">主辦活動設定</a></li>
+                  <li class="divider"></li>
+                  <!-- <li class="dropdown-header">Nav header</li> -->
+                  <li><a href="<?php echo $this->formActionUrl('list', 'order', null, null) ?>">參加活動設定</a></li>
                   <li><a href="#"><?php echo $this->getLoginStatus(); ?></a></li>
                 </ul>
               </li>

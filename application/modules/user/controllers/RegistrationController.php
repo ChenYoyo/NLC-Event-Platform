@@ -21,10 +21,8 @@ class User_RegistrationController extends Zend_Controller_Action
     }
 
     public function newAction()
-    {	
-    	
+    {
   		$url = $this->getRequest()->getParam('event');
-  		
   		$data = $this->getEventModel()->getEventDataByUrl($url);
   		// only one event(activity), at least one ticket
   		$this->view->event = $data[0];
@@ -32,7 +30,7 @@ class User_RegistrationController extends Zend_Controller_Action
   		$this->view->params = $url;
     }
 
-    public function orderAction()
+    public function purchaseAction()
     {
     	$request = $this->getRequest();
 
@@ -40,16 +38,19 @@ class User_RegistrationController extends Zend_Controller_Action
     		
     		$sql = 'SELECT name FROM groups WHERE 1';
 	    	$eventUrl = $request->getParam('event');
+	    	$data = $this->getEventModel()->getEventDataByUrl($eventUrl);
+	  		
+	  		# only one event(activity), at least one ticket
+	  		$this->view->event        = $data[0];
 
-	        $this->view->groups = $this->getFrontController()->getParam('bootstrap')->getResource('db')->fetchCol($sql);
-    		$this->view->required = $this->getEventModel()->getRequiredSetByUrl($eventUrl);
-    		$this->view->orders = $this->_calOrderPrice($request->getPost());
-    		
+	        $this->view->groups       = $this->getFrontController()->getParam('bootstrap')->getResource('db')->fetchCol($sql);
+    		$this->view->required     = $this->getEventModel()->getRequiredSetByUrl($eventUrl);
+    		$this->view->orders       = $this->_calOrderPrice($request->getPost());
     		$this->view->user_account = Zend_Auth::getInstance()->getIdentity();
-    		$this->view->params = $eventUrl;
+    		$this->view->params       = $eventUrl;
     	}
     }
-    
+
     /**
      * @author Yoyo
      * @param $post post data
@@ -79,10 +80,29 @@ class User_RegistrationController extends Zend_Controller_Action
 
     	if ($request->isPost()) {
     		$post = $request->getPost();
+
+    		// save post data into "order" table
     		require_once APPLICATION_PATH . '/modules/user/models/Registration.php';
     		$registrationModel = new User_Model_Registration();
-    		$registrationModel->establishOrder($post, $request->getParam('event'));
+
+    		$orderID = $this->_getOrderID($request->getParam('event'));
+    		$isEstablished = $registrationModel->establishOrder($post, $orderID);
+
+    		if ($isEstablished) {
+    			$this->redirect('order/event/id/' . $orderID);
+    		} else {
+    			$this->redirect('registration/new');
+    		}
     	}
+    }
+
+    private function _getOrderID($eventUrl)
+    {
+		$salt_start = '5Qw3zkFM3PonwRWn55xD';
+		$salt_end   = 'pr7X7zXTnq404sy';
+		$orderID     = md5($salt_start . $eventUrl . $salt_end);
+
+		return $orderID;
     }
 }
 
