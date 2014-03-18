@@ -8,6 +8,7 @@
             <th>報名時間</th>
         </tr>
     </thead>
+    <?php $orderStatus = Zend_Registry::get('orderStatus'); ?>
     <tbody>
         <?php foreach ($this->orders as $order): ?>
         <tr>
@@ -18,7 +19,7 @@
             <td><a href="<?php echo $this->formActionUrl('new', 'registration', null, array('event' => $order['url'])) ?>"><?php echo $order['event_name'] ?>
                 </a>
             </td>
-            <td><?php echo $order['status'] ?></td>
+            <td><?php echo $orderStatus[$order['status']] ?></td>
             <td><?php echo $order['start_time'] ?></td>
         </tr>
         <?php endforeach ?>

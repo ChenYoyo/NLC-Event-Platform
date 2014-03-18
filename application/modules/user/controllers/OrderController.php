@@ -33,6 +33,25 @@ class User_OrderController extends Zend_Controller_Action
 		$this->view->orders = $results;
     }
 
+    public function cancelOrderAjaxAction()
+    {
+    	$request = $this->getRequest();
+
+    	$updatedRows = $this->getFrontController()
+							->getParam('bootstrap')
+							->getResource('db')
+							->update('order',
+						    			array('status' => ORDER_CANCEL),
+						    			"order_id = '" . $request->getParam('id') . "'"
+					    	);
+
+		if ($updatedRows > 0) {
+			$this->_helper->json(array('result' => 'success'));
+		} else {
+			$this->_helper->json(array('result' => 'fail'));
+		}
+    }
+
     public function getModel()
     {
     	require_once APPLICATION_PATH . '/modules/user/models/Order.php';
@@ -42,7 +61,5 @@ class User_OrderController extends Zend_Controller_Action
 
 		return $this->_orderModel;
     }
-
-
 }
 

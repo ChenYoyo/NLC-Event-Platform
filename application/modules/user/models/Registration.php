@@ -59,7 +59,9 @@ class User_Model_Registration extends Zend_Db_Table_Abstract
 											'quantity'             => $post['quantity'][$i],
 											'order_time'           => $time,
 											'registration_form_fk' => $registration_formSN,
-											'order_id'             => $orderID)
+											'order_id'             => $orderID,
+											'status'               => ORDER_SUCCESS
+											)
 					);
 			}
 			$adapter->commit();

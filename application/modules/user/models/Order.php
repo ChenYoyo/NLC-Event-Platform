@@ -23,8 +23,8 @@ class User_Model_Order extends Zend_Db_Table_Abstract
 						->group('order_time')
 						->having('order.user_account_fk = ?', $user_account_sn)
 						->join('ticket', 'ticket.ticket_sn = order.ticket_fk', array('event_fk'))
-						->join('event', 'event.event_sn = event_fk', array('event_sn', 'event_name' => 'name', 'start_time', 'url'));
-		
+						->join('event', 'event.event_sn = event_fk', array('event_sn', 'event_name' => 'name', 'start_time', 'url'))
+						->order(array('order.order_time ASC'));
 		return $this->getAdapter()->fetchAll($select);
 	}
 	
@@ -36,7 +36,7 @@ class User_Model_Order extends Zend_Db_Table_Abstract
 	{
 		$select = $this->getAdapter()
 						->select()
-						->from($this->_name, array('quantity', 'order_time'))
+						->from($this->_name, array('quantity', 'order_time', 'order_id', 'status'))
 						->where('order.order_id = ?', $orderID)
 						->join('user_account', 'user_account.user_account_sn = order.user_account_fk', array('username'))
 						->join('ticket', 'order.ticket_fk = ticket.ticket_sn', array('ticket_name' => 'name', 'price'))

@@ -1,6 +1,12 @@
 
 <h1>訂票內容</h1>
-<a href="<?php echo $this->formActionUrl('new', 'registration', null, array('event' => $this->orderData[0]['url'])) ?>">回活動頁面</a>
+
+<a href="<?php echo $this->formActionUrl('new', 'registration', null, array('event' => $this->orderData[0]['url'])) ?>" class="btn btn-primary active" role="button">回活動頁面</a>
+
+<?php if ($this->orderData[0]['status'] != ORDER_CANCEL): ?>
+	<button type="button" class="btn btn-primary active cancel" onclick="cancelOrder(this.id)" id="<?php echo $this->orderData[0]['order_id'] ?>">取消活動</button>
+<?php endif ?>
+
 <table class="table table-bordered">
 	<thead>
 		<tr>
@@ -104,3 +110,26 @@
 			</tr>
 	<?php endif ?>
 </table>
+
+<script>
+	function cancelOrder (id) {
+			
+		if (window.confirm('取消報名將不可恢復，您確定要這麼做嗎？')) {
+			$.ajax({
+				async: false,
+				url: '/user/order/cancel.order.ajax',
+				data: {"id": id},
+				dataType: 'json',
+				success: function  (data) {
+					if (data.result == 'success') {
+						window.alert('成功取消報名。');
+						$('.cancel').remove();
+					} else{
+						window.alert('系統發生錯誤，請稍候再試。');
+						location.reload(true);
+					}
+				}
+			});
+		};
+	}
+</script>
