@@ -219,12 +219,24 @@
                 console.log('numberOfRows:' + numberOfRows);
             }
         });
+
+        
     });
+    
+    function PreviewImage() {
+        var oFReader = new FileReader();
+        oFReader.readAsDataURL(document.getElementById("uploadImage").files[0]);
+
+        oFReader.onload = function (oFREvent) {
+            document.getElementById("uploadPreview").src = oFREvent.target.result;
+        };
+    };
     </script>
-        <form action="<?php echo $this->url(array('module' => 'administration','controller'=>'event','action'=>'create'), null, FALSE); ?>" class="form-signin" role="form" method="post">
+        <form action="<?php echo $this->url(array('module' => 'administration','controller'=>'event','action'=>'create'), null, FALSE); ?>" class="form-signin" enctype="multipart/form-data" role="form" method="post">
             <div class="container">
                 <div class="row" id="divEditEvent">
                     <div class="col-cg-6">
+                    <h1>建立活動</h1>
                         <div class="form-group">
                             <label>活動名稱</label>
                             <input class="form-control" name="event[activityName]">
@@ -327,6 +339,14 @@
                         <div class="form-group">
                             <label>url</label>
                             <input class="form-control" name="event[url]">
+                        </div>
+                        <div class="form-group">
+                            <label>活動分享圖片</label>
+                            <img src="http://placehold.it/200x200" class="img-responsive" id="uploadPreview">
+                            <span class="btn btn-default btn-file" style="position: relative; overflow: hidden; ">
+                                選擇圖片上傳
+                                <input type="file" id="uploadImage" name="upload" onchange="PreviewImage();" style="position: absolute; top: 0; right: 0; min-width: 100%; min-height: 100%; font-size: 999px; text-align: right; filter: alpha(opacity=0); opacity: 0; outline: none; background: white; cursor: inherit; display: block;">
+                            </span>
                         </div>
                         <button type="button" class="btn btn-default" disabled="disabled">上一步</button>
                         <button id="editTicket" type="button" class="btn btn-default">下一步</button>
@@ -518,4 +538,4 @@
                     </div>
                 </div>
             </div>
-        </form>;
+        </form>

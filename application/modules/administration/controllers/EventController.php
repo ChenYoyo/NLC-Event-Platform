@@ -56,7 +56,7 @@ class Administration_EventController extends Zend_Controller_Action
                 } elseif ($key == 'activityName') {
                     $data['Name'] = $value;
                 } elseif ($key == 'description') {
-                    $data['description'] = strip_tags($value);
+                    $data['description'] = $value;
                 } else{
                     // do sth to catch error
                 }
@@ -67,13 +67,50 @@ class Administration_EventController extends Zend_Controller_Action
             do {
                 $data['url'] = uniqid();
             } while ($db->fetchOne($sql, $data['url']) != 0);
-            
-            $db->insert('event', $data);
 
+            $adapter = new Zend_File_Transfer_Adapter_Http();
+            $adapter->addValidator('Extension', false, array(  'extension' => 'jpg,png,jpeg',
+                                                                'messages' => array(Zend_Validate_File_Extension::FALSE_EXTENSION => "'%value%' 上傳錯誤地文件格式",
+                                                                                    Zend_Validate_File_Extension::NOT_FOUND       => "'%value%' 錯誤副檔名")))
+                    ->addValidator('IsImage', false, array( 'mimetype' => 'image/jpeg,image/png',
+                                                            'messages' => array(Zend_Validate_File_IsImage::FALSE_TYPE   => "檔案 '%value%'不是圖檔, 而是 '%type%'",
+                                                                                Zend_Validate_File_IsImage::NOT_DETECTED => "檔案 '%value%' mimetype的形式偵測不到",
+                                                                                Zend_Validate_File_IsImage::NOT_READABLE => "檔案 '%value%' 無法讀取或偵測不到")))
+                    ->addValidator('FilesSize', false, array('min'      => '1kB',
+                                                             'max'      => '2.5MB',
+                                                             'messages' => array(Zend_Validate_File_FilesSize::TOO_BIG      => "上傳檔案大小最大限制在 '%max%' 但此檔案大小為 '%size%'",
+                                                                                Zend_Validate_File_FilesSize::TOO_SMALL     => "上傳檔案大小最小限制在 '%max%' 但此檔案大小為 '%size%'",
+                                                                                Zend_Validate_File_FilesSize::NOT_READABLE  => "檔案無法讀取",)));
+
+            $adapter->setDestination(APPLICATION_PATH . '/../public/img/');
+
+            $oldFileName = $adapter->getFileName(null, false);
+            $extension = array_pop(explode('.', $oldFileName));
+            $newFileName = substr(md5(uniqid(rand(), true)), 3, 10) . '.' . $extension;
+
+            $adapter->addFilter('Rename', array('target' => APPLICATION_PATH . '/../public/img/' . $newFileName));
+
+            if ($adapter->receive()) {
+                $data['image'] = $newFileName;
+            } else{
+                $messages = $adapter->getMessages();
+                echo implode("\n", $messages);
+            }
+            
+            try {
+                $db->beginTransaction();
+                $db->insert('event', $data);
+                // important use lastInsertId() before you commit a transaction
+                $event_fk = $db->lastInsertId('event', 'event_sn');
+                $db->commit();
+                
+            } catch (Exception $e) {
+                $db->rollBack();
+            }
+            
             unset($data);
 
             // create the data of Table user_event
-            $event_fk = $db->lastInsertId('event', 'event_sn');
             $user_account_sn = Zend_Auth::getInstance()->getIdentity()->user_account_sn;
             $db->insert('user_event', array('user_account_fk' => $user_account_sn, 'event_fk' => $event_fk));            
             
@@ -90,12 +127,15 @@ class Administration_EventController extends Zend_Controller_Action
                 $data[$id]['event_fk'] = $event_fk;
             }
 
-            $db->beginTransaction();
-            foreach ($data as $insertData) {
-                $db->insert('ticket', $insertData);
+            try {
+                $db->beginTransaction();
+                foreach ($data as $insertData) {
+                    $db->insert('ticket', $insertData);
+                }
+                $db->commit();
+            } catch (Exception $e) {
+                $db->rollBack();
             }
-
-            $db->commit();
 
             unset($data);
 
