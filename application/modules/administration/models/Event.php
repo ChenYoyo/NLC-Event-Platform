@@ -39,5 +39,15 @@ class Administration_Model_Event extends Zend_Db_Table_Abstract
 
 		return $this->getAdapter()->fetchRow($select);
 	}
+
+	public function getAvailableEvents()
+	{
+		$select = $this->getAdapter()
+						->select()
+						->from($this->_name);
+		$results = $this->getAdapter()->fetchAll($select);
+
+		return $results;
+	}
 }
  ?>
