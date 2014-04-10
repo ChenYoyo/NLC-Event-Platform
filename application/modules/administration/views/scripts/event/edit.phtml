@@ -1,13 +1,11 @@
 <script src="//code.jquery.com/jquery-1.9.1.js"></script>
-  <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-  <link rel="stylesheet" href="/resources/demos/style.css">
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
-  
+
   <?php echo $this->headScript()->appendFile('/js/datetime-picker/bootstrap-datetimepicker.min.js', 'text/javascript'); ?>
   <?php echo $this->headScript()->appendFile('/js/datetime-picker/locales/bootstrap-datetimepicker.zh-TW.js', 'text/javascript'); ?>
   <?php echo $this->headScript()->appendFile('/ckeditor/ckeditor.js', 'text/javascript'); ?>
   
   <?php echo $this->headLink()->appendStylesheet('/css/datetime-picker/bootstrap-datetimepicker.min.css') ?>
+  <?php date_default_timezone_set('Asia/Taipei'); ?>
   <script>
     $(document).ready(function () {
 
@@ -75,30 +73,25 @@
         });
 
         var id;
+        var editID;
             
         $('.form_datetime_start_sales').on('hide', function  (event) {
             var startSalesValue = $('.dtp_startSales').val();
-            var startSalesID = '#dtp_startSales_' + id;
-            // id = $('.table tbody tr').length + 1;
+            var startSalesID = '#dtp_startSales_' + editID;
 
             if ($(startSalesID).length > 0) {
                 // hidden value exists
                 $(startSalesID).val(startSalesValue);
-            } else{
-                $(".saleTimePicker-start").append('<input type="hidden" id="dtp_startSales_' + id + '" name="ticket[' + id + '][sale_start]" value="' + startSalesValue + '" />');
             }
         });
 
         $('.form_datetime_end_sales').on('hide', function  (event) {
             var endSalesValue = $('.dtp_endSales').val();
-            var endSalesID = '#dtp_endSales_' + id;
-            // id = $('.table tbody tr').length + 1;
+            var endSalesID = '#dtp_endSales_' + editID;
 
             if ($(endSalesID).length > 0) {
                 // hidden value exists
                 $(endSalesID).val(endSalesValue);
-            } else{
-                $(".saleTimePicker-end").append('<input type="hidden" id="dtp_endSales_' + id + '" name="ticket[' + id + '][sale_end]" value="' + endSalesValue + '" />');
             }
         });
 
@@ -110,34 +103,106 @@
                 // id = $('.table tbody tr td.editTable button:last').attr('id').slice(11);
                 id++;
             }
-            console.log('newticket' + id);
+            // console.log('newticket' + id);
 
-            $("div#divEditTicket #spanNewTicket").append('<div class="col-cg-6 bg-success" id="NewTicket_' + id +'">' + 
+            $("div#divEditTicket table").after('<div class="col-cg-6 bg-success" id="NewTicket_' + id +'">' + 
                 '<div class="form-group">' + 
                     '<label>票種</label> <input class="form-control" type="text" id="ticc" name="ticket[' + id + '][ticketName]" placeholder="例如：一般票、學生票"></div>' + 
                 '<div class="form-group">' + 
                     '<label>數量</label> <input class="form-control" name="ticket[' + id + '][quantity]" placeholder="票種總和不可多於活動參加人數"> </div>' + 
                 '<div class="form-group"> <label>售價</label> <input class="form-control" name="ticket[' + id + '][price]" placeholder="單張票價"> </div>' +
-                '<span class="saleTimePicker_' + id + '"></span>' +
+                '<span id="spanNewTicket">' +
+                    '<span class="saleTimePicker" style="display:none;">' +
+                        '<div class="form-group saleTimePicker-start start_sales_' + id + '">' +
+                            '<label for="dtp_startSales" class="col-md-2 control-label">販售開始時間</label>' +
+                            '<div class="input-group date form_datetime form_datetime_start_sales col-md-5" data-date="" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_startSales" id="Div_dtp_startSales">' +
+                                '<input class="form-control" size="16" type="text" value="" readonly>' +
+                                '<span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>' +
+                                '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
+                            '</div>' +
+                            '<input type="hidden" class="dtp_startSales" id="dtp_startSales" value="" /><br/>' +
+                        '</div>' +
+                        '<div class="form-group saleTimePicker-end end_sales_' + id + '">' +
+                            '<label for="dtp_endSales" class="col-md-2 control-label">販售結束時間</label>' +
+                            '<div class="input-group date form_datetime form_datetime_end_sales col-md-5" data-date="" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_endSales" id="Div_dtp_endSales">' +
+                                '<input class="form-control" size="16" type="text" value="" readonly>' +
+                                '<span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>' +
+                                '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
+                            '</div>' +
+                            '<input type="hidden" class="dtp_endSales" id="dtp_endSales" value="" /><br/>' +
+                        '</div>' +
+                    '</span>' +
+                '</span>' +
                 '<div class="form-group"> <label>最少訂購數量</label> <select class="form-control" name="ticket[' + id + '][min_order]"> <option>1</option> <option>2</option> <option>3</option> </select> </div>' +
                 '<div class="form-group"> <label>最多訂購數量</label> <select class="form-control" name="ticket[' + id + '][max_order]"> <option>1</option> <option>2</option> <option>3</option> </select> </div>' +
-                '<button class="btn btn-default AddTicket" id="AddTicket_' + id + '" type="button" class="btn btn-default">新增</button>' +
-                '<button class="btn btn-default SaveTicket" id="SaveTicket_' + id + '" type="button" style="display:none;" class="btn btn-default">存檔</button>' + 
-                '<button class="btn btn-default DeleteTicket" id="DeleteTicket_' + id + '" type="button" style="display:none;" class="btn btn-default">刪除</button>' + 
-                '<button class="btn btn-default CancelTicket" id="CancelTicket_' + id + '" type="button" class="btn btn-default">取消</button> </div>'
-            );
                 
+                <?php if (!isset($this->event['url'])): ?>
+                '<button class="btn btn-default AddTicket" id="AddTicket_' + id + '" type="button" class="btn btn-default">新增</button>' +
+                <?php endif ?>
+                
+                '<button class="btn btn-default SaveTicket" id="SaveTicket_' + id + '" type="button" style="display:none;" class="btn btn-default">存檔</button>' +
+
+                <?php if (!isset($this->event['url'])): ?>
+                '<button class="btn btn-default DeleteTicket" id="DeleteTicket_' + id + '" type="button" style="display:none;" class="btn btn-default">刪除</button>' + 
+                '<button class="btn btn-default CancelTicket" id="CancelTicket_' + id + '" type="button" class="btn btn-default">取消</button>' +
+                <?php endif ?>
+
+                '</div>'
+            );
+            // initialize new datetimepicker
+            $('.form_datetime').datetimepicker({
+                language:  'zh-TW',
+                weekStart: 1,
+                todayBtn:  1,
+                autoclose: 1,
+                todayHighlight: 1,
+                startView: 2,
+                forceParse: 0,
+                showMeridian: 1,
+                pickerPosition: "bottom-left",
+                startDate: today,
+                minuteStep: 30
+            });
+
             var dom = '.saleTimePicker_' + id;
             $(".saleTimePicker").appendTo(dom);
             $(".saleTimePicker").show();
             $("#newTicket").attr('disabled', true);
             $(".editTable button").attr('disabled', true);
 
+            var start_sales = '.saleTimePicker-start.start_sales_' + id;
+            $('.form_datetime_start_sales').on('hide', function  (event) {
+                var startSalesValue = $('.dtp_startSales').val();
+                var startSalesID = '#dtp_startSales_' + id;
+                // id = $('.table tbody tr').length + 1;
+
+                if ($(startSalesID).length > 0) {
+                    // hidden value exists
+                    $(startSalesID).val(startSalesValue);
+                } else{
+                    $(start_sales).append('<input type="hidden" id="dtp_startSales_' + id + '" name="ticket[' + id + '][sale_start]" value="' + startSalesValue + '" />');
+                }
+            });
+
+            var end_sales = '.saleTimePicker-end.end_sales_' + id;
+            $('.form_datetime_end_sales').on('hide', function  (event) {
+                var endSalesValue = $('.dtp_endSales').val();
+                var endSalesID = '#dtp_endSales_' + id;
+                // id = $('.table tbody tr').length + 1;
+
+                if ($(endSalesID).length > 0) {
+                    // hidden value exists
+                    $(endSalesID).val(endSalesValue);
+                } else{
+                    $(end_sales).append('<input type="hidden" id="dtp_endSales_' + id + '" name="ticket[' + id + '][sale_end]" value="' + endSalesValue + '" />');
+                }
+            });
+
 
         });
         
         // AddTicket event
-        $('div#divEditTicket #spanNewTicket').on("click", 'button.AddTicket', function(){
+        $('div#divEditTicket').on("click", 'button.AddTicket', function(){
             var clickID = $(this).attr('id');
             clickID = clickID.slice(10);
             var ticketName = $('input[name="' + 'ticket[' + clickID + '][ticketName]' + '"]').val();
@@ -148,7 +213,7 @@
             // var min_order  = $('input[name="' + 'ticket[' + clickID + '][min_order]' + '"]').val();
             // var max_order  = $('input[name="' + 'ticket[' + clickID + '][max_order]' + '"]').val();
 
-            $('.table-bordered#ticketTable tbody').append('<tr>' +
+            $('.table-bordered#ticketTable tbody').append('<tr class="ID_' + clickID + '">' +
                                                     '<td>' + ticketName + '</td>' +
                                                     '<td>' + sale_start + '~' + sale_end + '</td>' +
                                                     '<td>' + price + '</td>' +
@@ -165,7 +230,7 @@
         });
         
         // CancelTicket event
-        $('div#divEditTicket #spanNewTicket').on("click", 'button.CancelTicket', function(){
+        $('div#divEditTicket').on("click", 'button.CancelTicket', function(){
             var clickID = $(this).attr('id');
             clickID = clickID.slice(13);
             // console.log('class="CancelTicket:' + clickID);
@@ -180,6 +245,7 @@
         $('.table-bordered#ticketTable tbody').on('click', '.editTable button', function(event) {
             var clickID = $(this).attr('id');
             clickID = clickID.slice(11);
+            editID = clickID;
             console.log('editTable:' + clickID);
             event.preventDefault();
             $("#AddTicket_" + clickID).hide();
@@ -192,21 +258,35 @@
         });
 
         // SaveTicket event
-        $('div#divEditTicket #spanNewTicket').on('click', 'button.SaveTicket', function(event) {
+        $('div#divEditTicket').on('click', 'button.SaveTicket', function(event) {
             var clickID = $(this).attr('id');
-
             clickID = clickID.slice(11);
+
+            var ticketName = $('input[name="' + 'ticket[' + clickID + '][ticketName]' + '"]').val();
+            var quantity   = $('input[name="' + 'ticket[' + clickID + '][quantity]' + '"]').val();
+            var price      = $('input[name="' + 'ticket[' + clickID + '][price]' + '"]').val();
+            var sale_start = $('input[name="' + 'ticket[' + clickID + '][sale_start]' + '"]').val();
+            var sale_end   = $('input[name="' + 'ticket[' + clickID + '][sale_end]' + '"]').val();            
+            
             $('#NewTicket_' + clickID).hide();
+
+            $('tr.ID_' + clickID).html('<td>' + ticketName + '</td>' +
+                                        '<td>' + sale_start + '~' + sale_end + '</td>' +
+                                        '<td>' + price + '</td>' +
+                                        '<td>' + quantity + '</td>' +
+                                        '<td class="editTable"><button type="button" class="btn btn-default" id="editTicket_' + clickID +'">編輯</button></td>'
+                                    );
             $("#newTicket").attr('disabled', false);
             $(".editTable button").attr('disabled', false);
         });
 
         // DeleteTicket event
-        $('div#divEditTicket #spanNewTicket').on('click', 'button.DeleteTicket', function(event) {
+        $('div#divEditTicket').on('click', 'button.DeleteTicket', function(event) {
             var clickID = $(this).attr('id');
             clickID = clickID.slice(13);
             console.log('DeleteTicket:' + clickID);
             $('#NewTicket_' + clickID).remove();
+            $('.ID_' + clickID).remove();
             $("#newTicket").attr('disabled', false);
             $(".editTable button").attr('disabled', false);
         });
@@ -232,117 +312,107 @@
         };
     };
     </script>
-        <form action="<?php echo $this->url(array('module' => 'administration','controller'=>'event','action'=>'create'), null, FALSE); ?>" class="form-signin" enctype="multipart/form-data" role="form" method="post">
+        <form action="<?php echo $this->formActionUrl($this->action, 'event', null, $this->params) ?>" class="form-signin" enctype="multipart/form-data" role="form" method="post">
             <div class="container">
                 <div class="row" id="divEditEvent">
                     <div class="col-cg-6">
                     <h1>建立活動</h1>
                         <div class="form-group">
                             <label>活動名稱</label>
-                            <input class="form-control" name="event[activityName]">
+                            <input class="form-control" name="event[activityName]" value="<?php echo @$this->event['name'] ?>">
                         </div>
-                        <!-- http://jqueryui.com/datepicker/ -->
-                        <!-- <div><p>Date: <input type="text" id="datepicker"></p><p>Date: <input type="text" id="datepicker"></p></div> -->
-                        <!-- <div class="form-group">
-                         -->    
-                         <!-- <div class="input-daterange" id="datepicker" >活動時間 -->
-                            <!-- http://runnable.com/UmOmQbKV4wpoAAGa/bootstrap-datepicker-example-date-range-from-to-with-%22today%22-button-activated2 -->
-                        
-                               <!--  <input type="text" class="input-small" name="start" />
-                                <span>~</span>
-                                <input type="text" class="input-small" name="end" />
-                            </div>
-                        </div> -->
                         <div class="form-group">
                             <label for="dtp_input1" class="col-md-2 control-label">活動開始時間</label>
-                            <div class="input-group date form_datetime col-md-5" data-date="<?php date_default_timezone_set('America/Los_Angeles'); echo date('Y-m-d'); ?>" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_input1">
-                                <input class="form-control" size="16" type="text" value="" readonly>
+                            <div class="input-group date form_datetime col-md-5" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_input1">
+                                <input class="form-control" size="16" type="text" value="<?php echo @$this->event['start_time'] ?> " readonly>
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                             </div>
-                            <input type="hidden" id="dtp_input1" value="" name="event[start_time]" /><br/>
+                            <input type="hidden" id="dtp_input1" value="<?php echo @$this->event['start_time'] ?> " name="event[start_time]" /><br/>
                         </div>
                         <div class="form-group">
                             <label for="dtp_input2" class="col-md-2 control-label">活動結束時間</label>
-                            <div class="input-group date form_datetime col-md-5" data-date="1979-09-16T05:25:07Z" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_input2">
-                                <input class="form-control" size="16" type="text" value="" readonly>
+                            <div class="input-group date form_datetime col-md-5" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_input2">
+                                <input class="form-control" size="16" type="text" value="<?php echo @$this->event['end_time'] ?> " readonly>
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                             </div>
-                            <input type="hidden" id="dtp_input2" value="" name="event[end_time]" /><br/>
+                            <input type="hidden" id="dtp_input2" value="<?php echo @$this->event['end_time'] ?> " name="event[end_time]" /><br/>
                         </div>
-                        <!-- <div class="form-group">
-                            <label for="dtp_input1" class="col-md-2 control-label">活動結束時間</label>
-                            <div class="input-group date form_datetime col-md-5" data-date="1979-09-16T05:25:07Z" data-date-format="dd MM yyyy - HH:ii p" data-link-field="dtp_input1">
-                                <input class="form-control" size="16" type="text" value="" readonly>
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                            </div>
-                            <input type="hidden" id="dtp_input1" value="" name="end_time" /><br/>
-                        </div> -->
                         <div class="form-group">
                             <label>活動地點</label>
-                            <select class="form-control" name="event[site]">
-                                <option value="1">新生命教會</option>
-                                <option value="2">新莊</option>
-                                <option value="3">其他</option>
-                            </select>
+                            <?php echo $this->formSelect('event[site]',
+                                                            @$this->event['site'],
+                                                            array('class' => 'form-control'),
+                                                            array(
+                                                                1 => '新生命教會',
+                                                                2 => '新莊',
+                                                                3 => '其他'
+                                                            )
+                                                )
+                            ?>
                         </div>
                         <div class="form-group">
                             <label>教室</label>
-                            <select class="form-control input-small" name="event[classroom]">
-                                <option value="1">第一教室</option>
-                                <option value="2">弟一區塊</option>
-                                <option value="3">其他</option>
-                            </select>
+                            <?php $classroomKey = Zend_Registry::get('classroomKey'); ?>
+                            <?php echo $this->formSelect('event[classroom]',
+                                                            @$this->event['classroom'],
+                                                            array('class' => 'form-control input-small'),
+                                                           $classroomKey
+                                                )
+                            ?>
                         </div>
                         <div class="form-group form-inline">
                             <label class="control-label">縣市</label>
-                            <select class="form-control input-small" name="event[county]">
-                                <option value="1">台北</option>
-                                <option value="2">台南</option>
-                                <option value="3">臺中</option>
-                            </select>
+                            <?php $CountyKey = Zend_Registry::get('CountyKey'); ?>
+                            <?php echo $this->formSelect('event[county]',
+                                                            @$this->event['county'],
+                                                            array('class' => 'form-control input-small'),
+                                                           $CountyKey
+                                                )
+                            ?>
                             <!-- <label>地址</label> -->
-                            <input class="form-control" name="event[address]" placeholder="士林區仁愛路34號">
+                            <input class="form-control" name="event[address]" value="<?php echo @$this->event['address'] ?>">
                         </div>
                         <div class="form-group">
                             <label>主辦人</label>
-                            <input class="form-control" name="event[host]">
+                            <input class="form-control" name="event[host]" value="<?php echo @$this->event['host'] ?>">
                         </div>
-                        
                         <div class="form-group">
                             <label>活動人數</label>
-                            <input class="form-control" name="event[capacity]">
+                            <input class="form-control" name="event[capacity]" value="<?php echo @$this->event['capacity'] ?>">
                         </div>
                         <div class="form-group">
                             <label>活動分類</label>
-                            <select class="form-control input-small" name="event[category]">
-                                <option value="1">娛樂</option>
-                                <option value="2">職場</option>
-                                <option value="3">生活</option>
-                            </select>
+                            <?php $categoryKey = Zend_Registry::get('categoryKey'); ?>
+                            <?php echo $this->formSelect('event[category]',
+                                                            @$this->event['category'],
+                                                            array('class' => 'form-control input-small'),
+                                                           $categoryKey
+                                                )
+                            ?>
                         </div>
                         <div class="form-group">
                             <label>活動描述</label>
-                            <textarea class="ckeditor" cols="80" id="editor1" name="event[description]" rows="10"></textarea>    
+                            <textarea class="ckeditor" cols="80" id="editor1" name="event[description]" rows="10"><?php echo @$this->event['description'] ?> </textarea>    
                         </div>
                         <div class="form-group">
                             <label>是否公開活動</label>
-                            <label class="radio-inline">
-                                <input type="radio" name="event[public]" id="optionsRadiosInline1" value="1" checked="">公開
-                            </label>
-                            <label class="radio-inline">
-                                <input type="radio" name="event[public]" id="optionsRadiosInline2" value="2">不公開
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <label>url</label>
-                            <input class="form-control" name="event[url]">
+                            <?php $privacyKey = Zend_Registry::get('privacyKey'); ?>
+                            <?php echo $this->formRadio('event[privacy]',
+                                                            @$this->event['privacy'],
+                                                            array('label_class' => 'radio-inline'),
+                                                           $privacyKey,
+                                                           '<span></span>'
+                                                )
+                            ?>
                         </div>
                         <div class="form-group">
                             <label>活動分享圖片</label>
-                            <img src="http://placehold.it/200x200" class="img-responsive" id="uploadPreview">
+                            <img src="<?php echo isset($this->event['image']) ? 
+                                                        '/img/' . $this->event['image'] :
+                                                         'http://placehold.it/200x200' ?>" 
+                             class="img-responsive" id="uploadPreview">
                             <span class="btn btn-default btn-file" style="position: relative; overflow: hidden; ">
                                 選擇圖片上傳
                                 <input type="file" id="uploadImage" name="upload" onchange="PreviewImage();" style="position: absolute; top: 0; right: 0; min-width: 100%; min-height: 100%; font-size: 999px; text-align: right; filter: alpha(opacity=0); opacity: 0; outline: none; background: white; cursor: inherit; display: block;">
@@ -365,35 +435,64 @@
                         </tr>
                       </thead>
                       <tbody>
-                        
+                        <?php if (isset($this->tickets)): ?>
+                            <?php foreach ($this->tickets as $key => $ticket): ?>
+                            <tr class="<?php echo 'ID_' . ($key + 1) ?> ">
+                                <td><?php echo $ticket['ticketName'] ?></td>
+                                <td><?php echo $ticket['sale_start'] . '~' . $ticket['sale_end'] ?></td>
+                                <td><?php echo $ticket['price'] ?></td>
+                                <td><?php echo $ticket['quantity'] ?></td>
+                                <td class="editTable"><button type="button" class="btn btn-default" id="<?php echo 'editTicket_' . ($key + 1) ?>">編輯</button></td>
+                            </tr>
+                            <?php endforeach ?>
+                        <?php endif ?>
                       </tbody>
                     </table>
-                    <span id="spanNewTicket">
-                        <span class="saleTimePicker" style="display:none;">
-                            <div class="form-group saleTimePicker-start">
-                                <label for="dtp_startSales" class="col-md-2 control-label">販售開始時間</label>
-                                <div class="input-group date form_datetime form_datetime_start_sales col-md-5" data-date="1979-09-16T05:25:07Z" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_startSales" id="Div_dtp_startSales">
-                                    <input class="form-control" size="16" type="text" value="" readonly>
-                                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                                </div>
-                                <input type="hidden" class="dtp_startSales" id="dtp_startSales" value="" /><br/>
+                    <?php if (isset($this->tickets)): ?>
+                        <?php foreach ($this->tickets as $key => $ticket): ?>
+                            <div class="col-cg-6 bg-success" id="<?php echo 'NewTicket_' . ($key + 1)  ?>" style="display:none;">
+                                <div class="form-group">
+                                    <label>票種</label> <input class="form-control" type="text" id="ticc" name="ticket[<?php echo ($key + 1)  ?>][ticketName]" placeholder="例如：一般票、學生票" value="<?php echo $ticket['ticketName'] ?>"></div>
+                                <div class="form-group">
+                                    <label>數量</label> <input class="form-control" name="ticket[<?php echo ($key + 1)  ?>][quantity]" placeholder="票種總和不可多於活動參加人數" value="<?php echo $ticket['quantity'] ?>"> </div>
+                                <div class="form-group"> <label>售價</label> <input class="form-control" name="ticket[<?php echo ($key + 1)  ?>][price]" placeholder="單張票價" value="<?php echo $ticket['price'] ?>"> </div>
+                                <span id="spanNewTicket">
+                                    <span class="saleTimePicker" style="">
+                                        <div class="form-group saleTimePicker-start">
+                                            <label for="dtp_startSales" class="col-md-2 control-label">販售開始時間</label>
+                                            <div class="input-group date form_datetime form_datetime_start_sales col-md-5" data-date="" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_startSales" id="Div_dtp_startSales">
+                                                <input class="form-control" size="16" type="text" value="<?php echo $ticket['sale_start'] ?>" readonly>
+                                                <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                            </div>
+                                            <input type="hidden" class="dtp_startSales" id="dtp_startSales" value="<?php echo $ticket['sale_start'] ?>" /><br/>
+                                            <input type="hidden" id="dtp_startSales_<?php echo ($key + 1)  ?>" name="ticket[<?php echo ($key + 1)  ?>][sale_start]" value="<?php echo $ticket['sale_start'] ?>" />
+                                        </div>
+                                        <div class="form-group saleTimePicker-end">
+                                            <label for="dtp_endSales" class="col-md-2 control-label">販售結束時間</label>
+                                            <div class="input-group date form_datetime form_datetime_end_sales col-md-5" data-date="" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_endSales" id="Div_dtp_endSales">
+                                                <input class="form-control" size="16" type="text" value="<?php echo $ticket['sale_end'] ?>" readonly>
+                                                <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                            </div>
+                                            <input type="hidden" class="dtp_endSales" id="dtp_endSales" value="<?php echo $ticket['sale_end'] ?>" /><br/>
+                                            <input type="hidden" id="dtp_endSales_<?php echo ($key + 1)  ?>" name="ticket[<?php echo ($key + 1)  ?>][sale_end]" value="<?php echo $ticket['sale_end'] ?>" />
+                                        </div>
+                                    </span>
+                                </span>
+                                    
+                                <div class="form-group"> <label>最少訂購數量</label> <select class="form-control" name="ticket[<?php echo ($key + 1)  ?>][min_order]"> <option>1</option> <option>2</option> <option>3</option> </select> </div>
+                                <div class="form-group"> <label>最多訂購數量</label> <select class="form-control" name="ticket[<?php echo ($key + 1)  ?>][max_order]"> <option>1</option> <option>2</option> <option>3</option> </select> </div>
+                                
+                                <button class="btn btn-default SaveTicket" id="SaveTicket_<?php echo ($key + 1)  ?>" type="button" style="" class="btn btn-default">存檔</button>
                             </div>
-                                                    
-                            <div class="form-group saleTimePicker-end">
-                                <label for="dtp_endSales" class="col-md-2 control-label">販售結束時間</label>
-                                <div class="input-group date form_datetime form_datetime_end_sales col-md-5" data-date="1979-09-16T05:25:07Z" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_endSales" id="Div_dtp_endSales">
-                                    <input class="form-control" size="16" type="text" value="" readonly>
-                                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                                </div>
-                                <input type="hidden" class="dtp_endSales" id="dtp_endSales" value="" /><br/>
-                            </div>
-                        </span>
-                    </span>
-                    <div>
-                        <button id="newTicket" type="button" class="btn btn-default">新增票種</button>
-                    </div>
+                        <?php endforeach ?>    
+                    <?php endif ?>
+                    <?php if (!isset($this->event['url'])): ?>
+                        <div>
+                            <button id="newTicket" type="button" class="btn btn-default">新增票種</button>
+                        </div>
+                    <?php endif ?>
                     <button id="editEvent" type="button" class="btn btn-default">上一步</button>
                     <button id="editForm" type="button" class="btn btn-default">下一步</button>
                 </div>
@@ -412,8 +511,11 @@
                                 <td>
                                     <div class="form-group checkbox">
                                         <label>
-                                            
-                                            <?php echo $this->formCheckbox('form[' . $data['name']. ']') ?>
+                                            <?php echo $this->formCheckbox('form[' . $data['name'] . ']',
+                                                                                                     null,
+                                                                                                      array('checked' => isset($this->required) ? $this->required[$data['name']] : '0'
+                                                                                                    )
+                                              ) ?>
                                         </label>
                                     </div>
                                 </td>
@@ -422,7 +524,6 @@
                                 </td>
                                 <td>
                                     <div class="form-group">
-                                        
                                         <?php echo $this->formText('xxx', null, array('class' => 'form-control', 'placeholder' => $data['placeholder'])) ?>
                                     </div>
                                 </td>
@@ -432,7 +533,7 @@
                                 <td>
                                     <div class="form-group checkbox">
                                         <label>
-                                            <input type="checkbox" value="1" name="form[birthday]">
+                                            <?php echo $this->formCheckbox('form[birthday]', null, array('checked' => isset($this->required) ? $this->required['birthday'] : '0')) ?>
                                         </label>
                                     </div>
                                 </td>
@@ -455,7 +556,7 @@
                                 <td>
                                     <div class="form-group checkbox">
                                         <label>
-                                            <input type="checkbox" value="1" name="form[gender]">
+                                            <?php echo $this->formCheckbox('form[gender]', null, array('checked' => isset($this->required) ? $this->required['gender'] : '0')) ?>
                                         </label>
                                     </div>
                                 </td>
@@ -472,7 +573,7 @@
                                 <td>
                                     <div class="form-group checkbox">
                                         <label>
-                                            <input type="checkbox" value="1" name="form[group]">
+                                            <?php echo $this->formCheckbox('form[group]', null, array('checked' => isset($this->required) ? $this->required['group'] : '0')) ?>
                                         </label>
                                     </div>
                                 </td>
@@ -489,7 +590,7 @@
                                 <td>
                                     <div class="form-group checkbox">
                                         <label>
-                                            <input type="checkbox" value="1" name="form[food]">
+                                            <?php echo $this->formCheckbox('form[food]', null, array('checked' => isset($this->required) ? $this->required['food'] : '0')) ?>
                                         </label>
                                     </div>
                                 </td>
@@ -506,7 +607,7 @@
                                 <td>
                                     <div class="form-group checkbox">
                                         <label>
-                                            <input type="checkbox" value="1" name="form[other]">
+                                            <?php echo $this->formCheckbox('form[other]', null, array('checked' => isset($this->required) ? $this->required['other'] : '0')) ?>
                                         </label>
                                     </div>
                                 </td>
@@ -521,18 +622,6 @@
                             </tr>
                         </tbody>
                     </table>
-                    <!-- 
-                        <div class="form-group">
-                            <label>設定表單</label>
-                            <input class="form-control" placeholder="例如：一般票、學生票">
-                            <p class="help-block">Example block-level help text here.</p>
-                        </div>
-                        <div class="form-group checkbox">
-                            <label>
-                        <input type="checkbox"> Remember me
-                            </label>
-                        </div>
-                     --> 
                         <button id="backTicket" type="button" class="btn btn-default">上一步</button>
                         <button id="submit" type="submit" class="btn btn-default">完成</button>
                     </div>

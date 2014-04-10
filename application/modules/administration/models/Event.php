@@ -40,6 +40,12 @@ class Administration_Model_Event extends Zend_Db_Table_Abstract
 		return $this->getAdapter()->fetchRow($select);
 	}
 
+	/**
+	 * @author Yoyo
+	 * @see used by user/ indexController
+	 * get online events
+	 * 
+	 */
 	public function getAvailableEvents()
 	{
 		$select = $this->getAdapter()
@@ -48,6 +54,17 @@ class Administration_Model_Event extends Zend_Db_Table_Abstract
 		$results = $this->getAdapter()->fetchAll($select);
 
 		return $results;
+	}
+
+	public function getUserSNByUrl($url)
+	{
+		$select = $this->getAdapter()
+						->select()
+						->from($this->_name, array('event_sn'))
+						->where('event.url = ?', $url)
+						->join('user_event', 'user_event.event_fk = event.event_sn', array('user_account_fk'));
+				
+		return $this->getAdapter()->fetchAll($select);
 	}
 }
  ?>
