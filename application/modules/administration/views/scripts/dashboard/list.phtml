@@ -1,0 +1,34 @@
+<h1>主辦的活動</h1>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>活動名稱</th>
+            <th>活動時間</th>
+            <th>活動變更</th>
+            <th>上下架</th>
+            <th>報名人資料</th>
+        </tr>
+    </thead>
+   <?php $publishKey = Zend_Registry::get('publishKey'); ?>
+    <tbody>
+        <?php foreach ($this->events as $event): ?>
+        <tr>
+            <td><a href="<?php echo $this->formActionUrl('new', 'registration', 'user', array('event' => $event['url'])) ?>"><?php echo $event['name'] ?></a></td>
+            <td><?php echo $event['start_time'] ?>~<?php echo $event['end_time'] ?></td>
+            <td><a href="<?php echo $this->formActionUrl('edit', 'event', null, array('event' => $event['url'])) ?>">編輯</a></td>
+            <td>
+                <div class="btn-group">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <?php echo $publishKey[$event['publish']] ?> <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="<?php echo $this->formActionUrl('publish', 'dashboard', null, array('event' => $event['url'])) ?>">上架</a></li>
+                    <li><a href="<?php echo $this->formActionUrl('draft', 'dashboard', null, array('event' => $event['url'])) ?>">下架</a></li>
+                  </ul>
+                </div>
+            </td>
+            <td><a href="<?php echo $this->formActionUrl('order', 'dashboard', null, array('event' => $event['url'])) ?>">訂單</a></td>
+        </tr>
+        <?php endforeach ?>
+    </tbody>
+</table>

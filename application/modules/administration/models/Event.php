@@ -50,7 +50,8 @@ class Administration_Model_Event extends Zend_Db_Table_Abstract
 	{
 		$select = $this->getAdapter()
 						->select()
-						->from($this->_name);
+						->from($this->_name)
+						->where('event.publish = ?', PUBLISH);
 		$results = $this->getAdapter()->fetchAll($select);
 
 		return $results;
@@ -64,6 +65,24 @@ class Administration_Model_Event extends Zend_Db_Table_Abstract
 						->where('event.url = ?', $url)
 						->join('user_event', 'user_event.event_fk = event.event_sn', array('user_account_fk'));
 				
+		return $this->getAdapter()->fetchAll($select);
+	}
+
+	public function getOrdersByUrl($url)
+	{
+		$select = $this->getAdapter()
+						->select()
+						->from($this->_name, array('event_sn'))
+						->where('event.url = ?', $url)
+						->join('ticket', 'ticket.event_fk = event.event_sn', array('ticket_name' => 'name', 'price'))
+						->join('order', 'order.ticket_fk = ticket.ticket_sn', array('quantity', 'order_time'))
+						->join('user_account', 'user_account.user_account_sn = order.user_account_fk', array('account_name' => 'username',
+																											'user_email' => 'email',
+																											'user_phone' => 'phone'))
+						->joinLeft('registration_form', 'order.registration_form_fk = registration_form.registration_form_sn')
+						->joinLeft('birthday', 'registration_form.birthday_fk = birthday.birthday_sn')
+						->joinLeft('groups', 'groups.groups_sn = registration_form.groups_fk', array('groups_name' => 'name'));
+
 		return $this->getAdapter()->fetchAll($select);
 	}
 }

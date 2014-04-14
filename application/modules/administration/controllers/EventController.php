@@ -226,7 +226,7 @@ class Administration_EventController extends Zend_Controller_Action
                                                          'messages' => array(Zend_Validate_File_FilesSize::TOO_BIG      => "上傳檔案大小最大限制在 '%max%' 但此檔案大小為 '%size%'",
                                                                             Zend_Validate_File_FilesSize::TOO_SMALL     => "上傳檔案大小最小限制在 '%max%' 但此檔案大小為 '%size%'",
                                                                             Zend_Validate_File_FilesSize::NOT_READABLE  => "檔案無法讀取",)));
-
+        
         $adapter->setDestination(APPLICATION_PATH . '/../public/img/');
 
         $oldFileName = $adapter->getFileName(null, false);

@@ -1,0 +1,146 @@
+<h1>報名人清單</h1>
+<a class="btn btn-primary" href="<?php echo $this->formActionUrl('export.Xls', 'dashboard', null, array('event' => $this->eventUrl)) ?>">匯出成Excel <span class="glyphicon glyphicon-chevron-right"></span></a>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <?php if (!is_null($this->orderData[0]['account_name'])): ?>
+                <th>使用者姓名</th>
+            <?php endif ?>
+            <?php if (!is_null($this->orderData[0]['user_email'])): ?>
+                <th>使用者Email</th>
+            <?php endif ?>
+            <?php if (!is_null($this->orderData[0]['ticket_name'])): ?>
+                <th>票種</th>
+            <?php endif ?>
+            <?php if (!is_null($this->orderData[0]['price'])): ?>
+                <th>價格</th>
+            <?php endif ?>
+            <?php if (!is_null($this->orderData[0]['quantity'])): ?>
+                <th>數量</th>
+            <?php endif ?>
+            <?php if (!is_null($this->orderData[0]['order_time'])): ?>
+                <th>購買時間</th>
+            <?php endif ?>
+            <?php if (!is_null($this->orderData[0]['name'])): ?>
+                <th>姓名</th>
+            <?php endif ?>
+            <?php if (!is_null($this->orderData[0]['email'])): ?>
+                <th>Email</th>
+            <?php endif ?>
+            <?php if (!is_null($this->orderData[0]['gender'])): ?>
+                <th>性別</th>
+            <?php endif ?>
+            <?php if (!is_null($this->orderData[0]['phone'])): ?>
+                <th>電話</th>
+            <?php endif ?>
+            <?php if (!is_null($this->orderData[0]['ID'])): ?>
+                <th>身分證字號</th>
+            <?php endif ?>
+            <?php if (!is_null($this->orderData[0]['beneficiary'])): ?>
+                <th>受益人</th>
+            <?php endif ?>
+            <?php if (!is_null($this->orderData[0]['groups_fk'])): ?>
+                <th>牧區</th>
+            <?php endif ?>
+            <?php if (!is_null($this->orderData[0]['food'])): ?>
+                <th>食物</th>
+            <?php endif ?>
+            <?php if (!is_null($this->orderData[0]['year']) &&
+                    !is_null($this->orderData[0]['month_fk']) &&
+                    !is_null($this->orderData[0]['day_fk'])): ?>
+                <th>生日</th>
+            <?php endif ?>
+            <?php if (!is_null($this->orderData[0]['other'])): ?>
+                <th>其他</th>
+            <?php endif ?>
+        </tr>
+    </thead>
+    <?php $orderStatus = Zend_Registry::get('orderStatus'); ?>
+    <tbody>
+        <?php foreach ($this->orderData as $order): ?>
+        <tr>
+            <?php if (isset($order['account_name'])): ?>
+                <td>
+                    <?php echo $order['account_name'] ?>
+                </td>
+            <?php endif ?>
+            <?php if (isset($order['user_email'])): ?>
+                <td>
+                    <a href="mailto:<?php echo $order['user_email'] ?> "><?php echo $order['user_email'] ?></a>
+                </td>
+            <?php endif ?>
+            <?php if (isset($order['price'])): ?>
+                <td>
+                    <?php echo $order['price'] ?>
+                </td>
+            <?php endif ?>
+            <?php if (isset($order['ticket_name'])): ?>
+                <td>
+                    <?php echo $order['ticket_name'] ?>
+                </td>
+            <?php endif ?>
+            <?php if (isset($order['quantity'])): ?>
+                <td>
+                    <?php echo $order['quantity'] ?>
+                </td>
+            <?php endif ?>
+            <?php if (isset($order['order_time'])): ?>
+                <td>
+                    <?php echo $order['order_time'] ?>
+                </td>
+            <?php endif ?>
+            <?php if (isset($order['name'])): ?>
+                <td>
+                    <?php echo $order['name'] ?>
+                </td>
+            <?php endif ?>
+            <?php if (isset($order['email'])): ?>
+                <td>
+                    <?php echo $order['email'] ?>
+                </td>
+            <?php endif ?>
+            <?php if (isset($order['gender'])): ?>
+                <td>
+                    <?php echo $order['gender'] ?>
+                </td>
+            <?php endif ?>
+            <?php if (isset($order['phone'])): ?>
+                <td>
+                    <?php echo $order['phone'] ?>
+                </td>
+            <?php endif ?>
+            <?php if (isset($order['ID'])): ?>
+                <td>
+                    <?php echo $order['ID'] ?>
+                </td>
+            <?php endif ?>
+            <?php if (isset($order['beneficiary'])): ?>
+                <td>
+                    <?php echo $order['beneficiary'] ?>
+                </td>
+            <?php endif ?>
+            <?php $groupsKey = Zend_Registry::get('groupsKey'); ?>
+            <?php if (isset($order['groups_fk'])): ?>
+                <td>
+                    <?php echo $groupsKey[$order['groups_fk']] ?>
+                </td>
+            <?php endif ?>
+            <?php if (isset($order['food'])): ?>
+                <td>
+                    <?php echo $order['food'] ?>
+                </td>
+            <?php endif ?>
+            <?php if (isset($order['birthday_fk'])): ?>
+                <td>
+                    <?php echo $order['year'] . '/' . $order['month_fk'] . '/' . $order['day_fk']?>
+                </td>
+            <?php endif ?>
+            <?php if (isset($order['other'])): ?>
+                <td>
+                    <?php echo $order['other'] ?>
+                </td>
+            <?php endif ?>
+        </tr>
+        <?php endforeach ?>
+    </tbody>
+</table>
