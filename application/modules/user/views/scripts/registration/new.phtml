@@ -67,7 +67,8 @@
             <div class="col-lg-4">
                 <div class="well">
                     <h4>活動地址</h4>
-                    <p>  <a href="http://maps.google.com.tw/maps?hl=zh-TW&q=<?php echo $this->event['county'] ?><?php echo $this->event['address'] ?>" target="_blank"><?php echo $this->event['address'] ?></a></p>
+                    <?php $CountyKey = Zend_Registry::get('CountyKey'); ?>
+                    <p>  <a href="http://maps.google.com.tw/maps?hl=zh-TW&q=<?php echo $CountyKey[$this->event['county']] . $this->event['address'] ?>" target="_blank"><?php echo $CountyKey[$this->event['county']] . $this->event['address'] ?></a></p>
                     <!-- <div class="input-group">
                         <input type="text" class="form-control">
                         <span class="input-group-btn">
