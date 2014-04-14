@@ -5,33 +5,64 @@
     <div class="container">
         <form action="<?php echo $this->baseUrl('login') ?>" class="form-signin" role="form" method="post">
             <h2 class="form-signin-heading">登入</h2>
-         <span>電子信箱：</span>    <?php echo $this->formText('user-email',
-                                                          ((isset($this->messages['user-email'])) ? $this->messages['user-email'] : null),
-                                                                                     array('class' => 'user-email form-control',
-                                                                                     'required' => '',
-                                                                                     'placeholder' => 'Email')) ?>
-                                                                                     <br>
-                                                                                     
-        <?php  if (isset($this->messages['user-emailVali'])) {
-                 echo $this->messages['user-emailVali'];
-                 echo '<br>';
-        } ?>                                                                                     
-                                                                                            
-        <span>密碼：</span> <?php echo $this->formPassword('password',
-                                                        ((isset($this->messages['password'])) ? $this->messages['password'] : null),
-                                                        array('class' => 'password form-control')) ?>
-        <br>
-        <?php  if (isset($this->messages['passwordVali'])) {
-                     echo $this->messages['passwordVali'];
-                     echo '<br>';
-                }
-        
-                if (isset($this->loginStatus)) {
-                     echo $this->loginStatus;
-                     echo '<br>';
-                }
-        ?>
-        <?php echo $this->formSubmit('submit', '登入', array('class' => 'submit btn btn-lg btn-primary btn-block')) ?>
-        
-        </form >
+            <div class="form-group <?php echo (isset($this->messages['user-emailVali']) ? 'has-error' : null) ?>">
+              <label class="control-label">電子信箱：</label>
+            <?php echo $this->formText('user-email',
+                                          ((isset($this->messages['user-email'])) ? $this->messages['user-email'] : null),
+                                                                     array('class' => 'user-email form-control',
+                                                                     'required' => '',
+                                                                     'placeholder' => 'Email')) 
+            ?>
+                                                                     <br>
+            <?php
+            if (isset($this->messages['user-emailVali'])) {
+                $emailVali = $this->messages['user-emailVali'];
+                echo <<<EOT
+                   <label class="control-label">
+                    $emailVali
+                   </label>
+EOT;
+            }        
+            ?>          
+            </div>
+
+            <div class="form-group <?php echo ((isset($this->messages['passwordVali']) ||
+                                                                isset($this->loginStatus)) ? 'has-error' : null) ?>">
+                <label class="control-label">密碼：</label>
+                <?php echo $this->formPassword('password',
+                                                            ((isset($this->messages['password'])) ? $this->messages['password'] : null),
+                                                            array('class' => 'password form-control')) ?>
+            <br>
+            <?php  if (isset($this->messages['passwordVali'])) {
+                        echo '<label class="control-label">';
+                        echo $this->messages['passwordVali'];
+                        echo '</label>';
+                    }
+            
+                    if (isset($this->loginStatus)) {
+                        echo '<label class="control-label">';
+                        echo $this->loginStatus;
+                        echo '</label>';
+                    }
+            ?>
+            </div>
+            <div class="form-group <?php echo (isset($this->messages['captchawordVali']) ? 'has-error' : null) ?>">
+                <label class="control-label">驗證碼:</label>
+                <div>
+                    <?php echo $this->captcha;?>
+                    <a class="btn btn-default" href="<?php echo $this->formActionUrl('index', 'login', null, null) ?>">重新產生</a>
+                </div>
+                <br>
+                <input type="text" name="captchaword[input]" class="form-control" placeholder="驗證碼" />
+
+                <?php  if (isset($this->messages['captchawordVali'])) {
+                         echo '<label class="control-label">';
+                         echo $this->messages['captchawordVali'];
+                         echo '</label>';
+                } ?>   
+                <input type="hidden" value="<?php echo $this->captchaId?>" name="captchaword[id]" />
+            </div>
+            <br>
+            <?php echo $this->formSubmit('submit', '登入', array('class' => 'submit btn btn-lg btn-primary btn-block')) ?>
+        </form>
     </div>

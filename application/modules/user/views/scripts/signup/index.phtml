@@ -5,68 +5,108 @@
     
     <form action="<?php echo $this->baseUrl('signup') ?>" class="form-signup" method="post">
         <h2 class="form-signup-heading">註冊</h2>
-        <span>電子信箱：</span>    <?php echo $this->formText('user-email',
-                                                     ((isset($this->messages['user-email'])) ? $this->messages['user-email'] : null),
-                                                                                array('class' => 'user-email form-control',
-                                                                                'required' => '',
-                                                                                'placeholder' => 'Email')) ?>
-                                                                                <br>
-                                                                                
+        <div class="form-group <?php echo (isset($this->error['user-emailVali']) ? 'has-error' : null) ?>">
+            <label class="control-label">電子信箱：</label >    
+            <?php echo $this->formText('user-email',
+                                     ((isset($this->messages['user-email'])) ? $this->messages['user-email'] : null),
+                                                                array('class' => 'user-email form-control',
+                                                                'required' => '',
+                                                                'placeholder' => 'Email')) ?>
+                                                                <br>
+                                                                        
             <?php  if (isset($this->error['user-emailVali'])) {
-            echo $this->error['user-emailVali'];
-            echo '<br>';
+                        echo '<label class="control-label">';
+                        echo $this->error['user-emailVali'];
+                        echo '</label>';
             } ?>
+        </div>
     
-            <span>姓名：</span>    <?php echo $this->formText('name',
-                                                     ((isset($this->messages['name'])) ? $this->messages['name'] : null),
-                                                                                array('class' => 'name form-control',
-                                                                                'required' => '',
-                                                                                'placeholder' => '姓名')) ?>
-                                                                                <br>
-                                                                                
+        <div class="form-group <?php echo (isset($this->error['nameVali']) ? 'has-error' : null) ?>">
+            <label class="control-label">姓名：</label>
+            <?php echo $this->formText('name',
+                                         ((isset($this->messages['name'])) ? $this->messages['name'] : null),
+                                                                    array('class' => 'name form-control',
+                                                                    'required'    => '',
+                                                                    'placeholder' => '姓名')) ?>
+                                                                    <br>
+                                                                    
             <?php  if (isset($this->error['nameVali'])) {
-            echo $this->error['nameVali'];
-            echo '<br>';
-            } ?>                                                                                     
+                        echo '<label class="control-label">';
+                        echo $this->error['nameVali'];
+                        echo '</label>';
+            } ?>
+        </div>
                                                                                        
-            <span>密碼：</span> <?php echo $this->formPassword('password1',
+        <div class="form-group <?php echo ((isset($this->error['password1_Vali']) ||
+                                            isset($this->error['passwordIdentical'])) ? 'has-error' : null) ?>">
+            <label class="control-label">密碼：</label>
+            <?php echo $this->formPassword('password1',
                                                    null,
-                                                   array('class' => 'password1 form-control', 'required' => '')) ?>
+                                                   array('class' => 'password1 form-control', 'required' => ''))
+            ?>
             <br>
             <?php  if (isset($this->error['password1_Vali'])) {
-                echo $this->error['password1_Vali'];
-                echo '<br>';
-           }
-    
-           if (isset($this->loginStatus)) {
-                echo $this->loginStatus;
-                echo '<br>';
-           }
+                        echo '<label class="control-label">';
+                        echo $this->error['password1_Vali'];
+                        echo '</label>';
+                   }
+                
+                   if (isset($this->loginStatus)) {
+                    echo '<label class="control-label">';
+                    echo $this->loginStatus;
+                    echo '</label>';
+                   }
             ?>
+        </div>
     
-            <span>確認密碼：</span> <?php echo $this->formPassword('password2',
+        <div class="form-group <?php echo ((isset($this->error['password2_Vali']) ||
+                                            isset($this->error['passwordIdentical'])) ? 'has-error' : null) ?>">
+            <label class="control-label">確認密碼：</label>
+            <?php echo $this->formPassword('password2',
                                                    null,
-                                                   array('class' => 'password2 form-control', 'required' => '')) ?>
+                                                   array('class' => 'password2 form-control', 'required' => ''))
+            ?>
             <br>
             <?php  if (isset($this->error['password2_Vali'])) {
-                echo $this->error['password2_Vali'];
-                echo '<br>';
-           }
-
+                        echo '<label class="control-label">';
+                        echo $this->error['password2_Vali'];
+                        echo '</label>';
+                   }
+            
                 if (isset($this->error['passwordIdentical'])) {
-                echo $this->error['passwordIdentical'];
-                echo '<br>';
-           }
+                        echo '<label class="control-label">';
+                        echo $this->error['passwordIdentical'];
+                        echo '</label>';
+                }
             ?>
+        </div>
+
+            <div class="form-group <?php echo (isset($this->error['captchawordVali']) ? 'has-error' : null) ?>">
+                <label class="control-label">驗證碼:</label>
+                <div>
+                    <?php echo $this->captcha;?>
+                    <a class="btn btn-default" href="<?php echo $this->formActionUrl('index', 'signup', null, null) ?>">重新產生</a>
+                </div>
+                <br>
+                <input type="text" name="captchaword[input]" class="form-control" placeholder="驗證碼" />
+
+                <?php  if (isset($this->error['captchawordVali'])) {
+                         echo '<label class="control-label">';
+                         echo $this->error['captchawordVali'];
+                         echo '</label>';
+                } ?>   
+                <input type="hidden" value="<?php echo $this->captchaId?>" name="captchaword[id]" />
+            </div>
+            <br>
             <?php echo $this->formCheckbox('agree', NULL, array('class' => 'agree form-control', 'required' => '', 'checked' => (bool)($this->messages['agree']))) ?>
             <span>我同意<a href="#">服務條款</a>及<a href="#">隱私權政策</a></span>
-            <?php if (isset($this->error['name_Vali'])) {
-                echo $this->error['name_Vali'];
-                echo '<br>'; 
-                }
+            <?php 
                 if (isset($this->signupStatus)) {
+                echo '<div class="form-group has-error">';
+                echo '<label class="control-label">';
                 echo $this->signupStatus;
-                echo '<br>';
+                echo '</label>';
+                echo '</div>';
            }
             ?>
             <?php echo $this->formSubmit('submit', '註冊', array('class' => 'submit form-control')) ?>

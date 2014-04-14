@@ -23,6 +23,16 @@ class User_LoginController extends Zend_Controller_Action
 
 		$emailValidator = new Zend_Validate_EmailAddress();
 
+        $captcha = new Zend_Captcha_Image();
+        $captcha->setName('captchaword')
+                ->setFont(APPLICATION_PATH . '/data/arial.ttf')
+                ->setFontSize(28)
+                ->setImgDir(APPLICATION_PATH . '/../public/img')
+                ->setImgUrl('/img')
+                ->setWordLen(5)
+                ->setDotNoiseLevel(20)
+                ->setExpiration(300);
+
 		$request =$this->getRequest();
 		$post = $request->getPost();
 
@@ -37,6 +47,10 @@ class User_LoginController extends Zend_Controller_Action
             	$messages['user-emailVali'] = '請輸入正確的Email帳號';
             	$noValiError = false;
             }
+            if (!$captcha->isValid($post['captchaword'])) {
+                $messages['captchawordVali'] = '認證碼輸入錯誤';
+                $noValiError = false;
+            }
 
             $messages['password'] = $post['password'];
             $messages['user-email'] = $post['user-email'];
@@ -47,11 +61,14 @@ class User_LoginController extends Zend_Controller_Action
 
             	$this->view->messages = $messages;
             } else {
-            	$this->view->messages = $messages;
+                $this->_genCaptcha($captcha);
+                $this->view->messages = $messages;
             }
+        } else {
+            $this->_genCaptcha($captcha);
         }
 
-        if (Zend_Auth::getInstance()->hasIdentity()) {
+        if (Zend_Auth::getInstance()->hasIdentity() && $noValiError) {
             $this->redirect('index/index');
         }
     }
@@ -94,6 +111,16 @@ class User_LoginController extends Zend_Controller_Action
     	}else {
 			$this->view->loginStatus = '請重新登入';
     	}
+    }
+
+    /**
+     * @param mixed $captcha captcha_image class
+     */
+    protected function _genCaptcha($captcha)
+    {
+        $id = $captcha->generate();
+        $this->view->captchaId = $id;
+        $this->view->captcha = $captcha->render($this->view);
     }
 
     /**

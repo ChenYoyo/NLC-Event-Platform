@@ -21,6 +21,16 @@ class User_SignupController extends Zend_Controller_Action
         $password2_Validator->addValidator(new Zend_Validate_StringLength(array('min' => 6, 'max' => 12)))
                            ->addValidator(new Zend_Validate_Alnum());
         
+        $captcha = new Zend_Captcha_Image();
+        $captcha->setName('captchaword')
+                ->setFont(APPLICATION_PATH . '/data/arial.ttf')
+                ->setFontSize(28)
+                ->setImgDir(APPLICATION_PATH . '/../public/img')
+                ->setImgUrl('/img')
+                ->setWordLen(5)
+                ->setDotNoiseLevel(20)
+                ->setExpiration(300);
+        
         $request =$this->getRequest();
         $post = $request->getPost();
 
@@ -39,21 +49,25 @@ class User_SignupController extends Zend_Controller_Action
                 $noValiError = false;
             }
             if (!$password1_Validator->isValid($post['password1'])) {
-                $error['password1_Vali'] = '密碼長度需介於6～12之間，而且只能使用數字、英文';
+                $error['password1_Vali'] = '1.密碼長度需介於6～12之間，而且只能使用數字、英文';
                 $noValiError = false;
             }
             if (!$password2_Validator->isValid($post['password2'])) {
-                $error['password2_Vali'] = '密碼長度需介於6～12之間，而且只能使用數字、英文';
+                $error['password2_Vali'] = '1.密碼長度需介於6～12之間，而且只能使用數字、英文';
                 $noValiError = false;
             }
             if (isset($post['password1'])&&
                 isset($post['password2'])&&
                 !($post['password1'] == $post['password2'])) {
-                $error['passwordIdentical'] = '密碼輸入不同';
+                $error['passwordIdentical'] = '2.密碼輸入不同';
                 $noValiError = false;
             }
             if (!($post['agree'] == 1)) {
                 $error['agreeVali'] = '需同意服務條款及隱私權政策，才可以註冊';
+                $noValiError = false;
+            }
+            if (!$captcha->isValid($post['captchaword'])) {
+                $error['captchawordVali'] = '認證碼輸入錯誤';
                 $noValiError = false;
             }
 
@@ -63,10 +77,23 @@ class User_SignupController extends Zend_Controller_Action
                 $this->view->messages = $post;
                 $this->redirect('index/index');
             } else {
+                $this->_genCaptcha($captcha);
                 $this->view->error = $error;
                 $this->view->messages = $post;
             }
+        } else {
+            $this->_genCaptcha($captcha);
         }
+    }
+
+    /**
+     * @param mixed $captcha captcha_image class
+     */
+    protected function _genCaptcha($captcha)
+    {
+        $id = $captcha->generate();
+        $this->view->captchaId = $id;
+        $this->view->captcha = $captcha->render($this->view);
     }
 
     protected function _signup($post)
