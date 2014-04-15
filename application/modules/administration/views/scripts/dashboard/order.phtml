@@ -1,4 +1,5 @@
 <h1>報名人清單</h1>
+<?php if (!empty($this->orderData)): ?>
 <a class="btn btn-primary" href="<?php echo $this->formActionUrl('export.Xls', 'dashboard', null, array('event' => $this->eventUrl)) ?>">匯出成Excel <span class="glyphicon glyphicon-chevron-right"></span></a>
 <table class="table table-bordered">
     <thead>
@@ -144,3 +145,17 @@
         <?php endforeach ?>
     </tbody>
 </table>
+<?php else: ?>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <?php $orderKey = Zend_Registry::get('orderKey'); ?>
+            <?php foreach ($orderKey as $key => $value): ?>
+                <td>
+                    <?php echo $value ?>
+                </td>
+            <?php endforeach ?>
+        </tr>
+    </thead>
+</table>    
+<?php endif ?>
