@@ -22,7 +22,8 @@ class Administration_Model_Event extends Zend_Db_Table_Abstract
 																								'sale_start',
 																								'sale_end',
 																								'min_order',
-																								'max_order')
+																								'max_order',
+																								'ticket_id')
 						)
 						->where('event.url = ?', $url);
 		

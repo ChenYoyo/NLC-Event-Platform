@@ -16,9 +16,51 @@
         });
 
         $("#editTicket").click(function(event) {
-            $("#divEditEvent").hide();
-            $("#divEditTicket").show();
-            $("#divEditForm").hide();
+            var activitySel = "input[name='event[activityName]']";
+            var start_timeSel = "input[name='event[start_time]']";
+            var end_timeSel = "input[name='event[end_time]']";
+
+            var activityValue = $(activitySel).val();
+            var start_timeValue = $(start_timeSel).val();
+            var end_timeValue = $(end_timeSel).val();
+
+            var isRequired = false;
+
+            if (!$.trim(activityValue)) {
+                $('.activityName').attr('class', 'form-group activityName has-error');
+                $(activitySel).after('<label id="activityName" class="control-label">請輸入</label>');
+                $(activitySel).focus();
+                isRequired = true;
+            } else{
+                $('.activityName').attr('class', 'form-group activityName');
+                $("#activityName").remove();
+            };
+
+            if (!$.trim(start_timeValue)) {
+                $('.start_time').attr('class', 'form-group start_time has-error');
+                $(start_timeSel).after('<label id="start_time" class="control-label">請輸入開始時間</label>');
+                $(start_timeSel).focus();
+                isRequired = true;
+            } else{
+                $('.start_time').attr('class', 'form-group start_time');
+                $('#start_time').remove();
+            };
+
+            if (!$.trim(end_timeValue)) {
+                $('.end_time').attr('class', 'form-group end_time has-error');
+                $(end_timeSel).after('<label id="end_time" class="control-label">請輸入結束時間</label>');
+                $(end_timeSel).focus();
+                isRequired = true;
+            } else{
+                $('.end_time').attr('class', 'form-group end_time');
+                $('#end_time').remove();
+            };
+            
+            if (!isRequired) {
+                $("#divEditEvent").hide();
+                $("#divEditTicket").show();
+                $("#divEditForm").hide();
+            };
         });
 
         $("#backTicket").click(function(event) {
@@ -74,29 +116,78 @@
 
         var id;
         var editID;
-            
-        $('.form_datetime_start_sales').on('hide', function  (event) {
-            var startSalesValue = $('.dtp_startSales').val();
-            var startSalesID = '#dtp_startSales_' + editID;
+        
+        $('.form_datetime_dtp_input1').on('hide', function  (event) {
+            var start_time = $("input[name='event[start_time]']").val();
+            var end_time   = $("input[name='event[end_time]']").val();
 
+            $('.form_datetime_dtp_input2').datetimepicker('setStartDate', start_time);
+            
+            if (start_time > end_time) {
+                $(".form_datetime_dtp_input2").datetimepicker('update', start_time);
+            };
+        });
+
+        $('.form_datetime_start_sales').on('hide', function  (event) {
+            var clickID;
+            
+            if ( $("div[id^='NewTicket_'][style^='display: block;'] .form_datetime_start_sales").length === 0){
+                clickID = editID;
+            }else{
+                 clickID = $("div[id^='NewTicket_'][style^='display: block;'] .form_datetime_start_sales").parent().attr('class').match(/form-group saleTimePicker-start start_sales_(\d)/)[1];
+            }
+            var start_sales = '.saleTimePicker-start.start_sales_' + clickID;
+            var end_sales = '.saleTimePicker-end.end_sales_' + clickID;
+
+            var startSalesID    = '#dtp_startSales_' + clickID;
+            var endSalesID      = '#dtp_endSales_' + clickID;
+            var startSales_time = $(start_sales + ' .dtp_startSales' + clickID).val();
+            var endSales_time   = $(end_sales + ' .dtp_endSales' + clickID).val();
+            var dtp_end = '.end_sales_' + clickID + ' .form_datetime_end_sales';
+            $(dtp_end).datetimepicker('setStartDate', startSales_time);
+
+            // console.log('clickID:' + clickID);
+            // console.log('startSales_time' + startSales_time);
             if ($(startSalesID).length > 0) {
                 // hidden value exists
-                $(startSalesID).val(startSalesValue);
+                $(startSalesID).val(startSales_time);
+            } else{
+                $(start_sales).append('<input type="hidden" id="dtp_startSales_' + clickID + '" name="ticket[' + clickID + '][sale_start]" value="' + startSales_time + '" />');
             }
+
+            if (startSales_time > endSales_time) {
+                $(dtp_end).datetimepicker('update', startSales_time);
+                if ($(endSalesID).length > 0) {
+                    // hidden value exists
+                    $(endSalesID).val(startSales_time);
+                } else{
+                    $(end_sales).append('<input type="hidden" id="dtp_endSales_' + clickID + '" name="ticket[' + clickID + '][sale_end]" value="' + startSales_time + '" />');
+                }
+            };
         });
 
         $('.form_datetime_end_sales').on('hide', function  (event) {
-            var endSalesValue = $('.dtp_endSales').val();
-            var endSalesID = '#dtp_endSales_' + editID;
+            var clickID;
+            clickID = editID;
+            if ( $("div[id^='NewTicket_'][style^='display: block;'] .form_datetime_start_sales").length === 0){
+                clickID = editID;
+            }else{
+                 clickID = $("div[id^='NewTicket_'][style^='display: block;'] .form_datetime_start_sales").parent().attr('class').match(/form-group saleTimePicker-start start_sales_(\d)/)[1];
+            }
+            var end_sales = '.saleTimePicker-end.end_sales_' + clickID;
+            var endSales_time   = $(end_sales + ' .dtp_endSales' + clickID).val();
+            var endSalesID = '#dtp_endSales_' + clickID;
+            // id = $('.table tbody tr').length + 1;
 
             if ($(endSalesID).length > 0) {
                 // hidden value exists
-                $(endSalesID).val(endSalesValue);
+                $(endSalesID).val(endSales_time);
+            } else{
+                $(end_sales).append('<input type="hidden" id="dtp_endSales_' + clickID + '" name="ticket[' + clickID + '][sale_end]" value="' + endSales_time + '" />');
             }
         });
 
         $('#newTicket').click(function(event) {
-
             if( $('.table tbody tr td.editTable button:last').attr('id') === undefined) {
                 id = 1;
             } else {
@@ -114,22 +205,22 @@
                 '<span id="spanNewTicket">' +
                     '<span class="saleTimePicker" style="display:none;">' +
                         '<div class="form-group saleTimePicker-start start_sales_' + id + '">' +
-                            '<label for="dtp_startSales" class="col-md-2 control-label">販售開始時間</label>' +
-                            '<div class="input-group date form_datetime form_datetime_start_sales col-md-5" data-date="" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_startSales" id="Div_dtp_startSales">' +
+                            '<label for="dtp_startSales' + id + '" class="col-md-2 control-label">販售開始時間</label>' +
+                            '<div class="input-group date form_datetime form_datetime_start_sales col-md-5" data-date="" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_startSales' + id + '" id="Div_dtp_startSales_' + id + '">' +
                                 '<input class="form-control" size="16" type="text" value="" readonly>' +
                                 '<span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>' +
                                 '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
                             '</div>' +
-                            '<input type="hidden" class="dtp_startSales" id="dtp_startSales" value="" /><br/>' +
+                            '<input type="hidden" class="dtp_startSales' + id + '" id="dtp_startSales' + id + '" value="" /><br/>' +
                         '</div>' +
                         '<div class="form-group saleTimePicker-end end_sales_' + id + '">' +
-                            '<label for="dtp_endSales" class="col-md-2 control-label">販售結束時間</label>' +
-                            '<div class="input-group date form_datetime form_datetime_end_sales col-md-5" data-date="" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_endSales" id="Div_dtp_endSales">' +
+                            '<label for="dtp_endSales' + id + '" class="col-md-2 control-label">販售結束時間</label>' +
+                            '<div class="input-group date form_datetime form_datetime_end_sales col-md-5" data-date="" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_endSales' + id + '" id="Div_dtp_endSales">' +
                                 '<input class="form-control" size="16" type="text" value="" readonly>' +
                                 '<span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>' +
                                 '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
                             '</div>' +
-                            '<input type="hidden" class="dtp_endSales" id="dtp_endSales" value="" /><br/>' +
+                            '<input type="hidden" class="dtp_endSales' + id + '" id="dtp_endSales' + id + '" value="" /><br/>' +
                         '</div>' +
                     '</span>' +
                 '</span>' +
@@ -170,63 +261,117 @@
             $("#newTicket").attr('disabled', true);
             $(".editTable button").attr('disabled', true);
 
-            var start_sales = '.saleTimePicker-start.start_sales_' + id;
             $('.form_datetime_start_sales').on('hide', function  (event) {
-                var startSalesValue = $('.dtp_startSales').val();
-                var startSalesID = '#dtp_startSales_' + id;
-                // id = $('.table tbody tr').length + 1;
+                var clickID;
+                if ( $("div[id^='NewTicket_'][style^='display: block;'] .form_datetime_start_sales").length === 0){
+                    clickID = id;
+                }else{
+                     clickID = $("div[id^='NewTicket_'][style^='display: block;'] .form_datetime_start_sales").parent().attr('class').match(/form-group saleTimePicker-start start_sales_(\d)/)[1];
+                }
+                var start_sales = '.saleTimePicker-start.start_sales_' + clickID;
+                var end_sales = '.saleTimePicker-end.end_sales_' + clickID;
 
+                var startSalesID    = '#dtp_startSales_' + clickID;
+                var endSalesID      = '#dtp_endSales_' + clickID;
+                var startSales_time = $(start_sales + ' .dtp_startSales' + clickID).val();
+                var endSales_time   = $(end_sales + ' .dtp_endSales' + clickID).val();
+                var dtp_end = '.end_sales_' + clickID + ' .form_datetime_end_sales';
+                $(dtp_end).datetimepicker('setStartDate', startSales_time);
                 if ($(startSalesID).length > 0) {
                     // hidden value exists
-                    $(startSalesID).val(startSalesValue);
+                    $(startSalesID).val(startSales_time);
                 } else{
-                    $(start_sales).append('<input type="hidden" id="dtp_startSales_' + id + '" name="ticket[' + id + '][sale_start]" value="' + startSalesValue + '" />');
+                    $(start_sales).append('<input type="hidden" id="dtp_startSales_' + clickID + '" name="ticket[' + clickID + '][sale_start]" value="' + startSales_time + '" />');
                 }
+
+                if (startSales_time > endSales_time) {
+                    $(dtp_end).datetimepicker('update', startSales_time);
+                    if ($(endSalesID).length > 0) {
+                        // hidden value exists
+                        $(endSalesID).val(startSales_time);
+                    } else{
+                        $(end_sales).append('<input type="hidden" id="dtp_endSales_' + clickID + '" name="ticket[' + clickID + '][sale_end]" value="' + startSales_time + '" />');
+                    }
+                };
             });
 
-            var end_sales = '.saleTimePicker-end.end_sales_' + id;
             $('.form_datetime_end_sales').on('hide', function  (event) {
-                var endSalesValue = $('.dtp_endSales').val();
-                var endSalesID = '#dtp_endSales_' + id;
+                var clickID;
+                if ( $("div[id^='NewTicket_'][style^='display: block;'] .form_datetime_start_sales").length === 0){
+                    clickID = id;
+                }else{
+                     clickID = $("div[id^='NewTicket_'][style^='display: block;'] .form_datetime_start_sales").parent().attr('class').match(/form-group saleTimePicker-start start_sales_(\d)/)[1];
+                }
+                var end_sales = '.saleTimePicker-end.end_sales_' + clickID;
+                var endSales_time   = $(end_sales + ' .dtp_endSales' + clickID).val();
+                var endSalesID = '#dtp_endSales_' + clickID;
                 // id = $('.table tbody tr').length + 1;
 
                 if ($(endSalesID).length > 0) {
                     // hidden value exists
-                    $(endSalesID).val(endSalesValue);
+                    $(endSalesID).val(endSales_time);
                 } else{
-                    $(end_sales).append('<input type="hidden" id="dtp_endSales_' + id + '" name="ticket[' + id + '][sale_end]" value="' + endSalesValue + '" />');
+                    $(end_sales).append('<input type="hidden" id="dtp_endSales_' + clickID + '" name="ticket[' + clickID + '][sale_end]" value="' + endSales_time + '" />');
                 }
             });
-
-
         });
         
         // AddTicket event
         $('div#divEditTicket').on("click", 'button.AddTicket', function(){
             var clickID = $(this).attr('id');
             clickID = clickID.slice(10);
-            var ticketName = $('input[name="' + 'ticket[' + clickID + '][ticketName]' + '"]').val();
-            var quantity   = $('input[name="' + 'ticket[' + clickID + '][quantity]' + '"]').val();
-            var price      = $('input[name="' + 'ticket[' + clickID + '][price]' + '"]').val();
-            var sale_start = $('input[name="' + 'ticket[' + clickID + '][sale_start]' + '"]').val();
-            var sale_end   = $('input[name="' + 'ticket[' + clickID + '][sale_end]' + '"]').val();
+
+            var sale_startSel = 'input[name="' + 'ticket[' + clickID + '][sale_start]' + '"]';
+            var sale_endSel   = 'input[name="' + 'ticket[' + clickID + '][sale_end]' + '"]';
+
+            var ticketName    = $('input[name="' + 'ticket[' + clickID + '][ticketName]' + '"]').val();
+            var quantity      = $('input[name="' + 'ticket[' + clickID + '][quantity]' + '"]').val();
+            var price         = $('input[name="' + 'ticket[' + clickID + '][price]' + '"]').val();
+            var sale_startVal = $(sale_startSel).val();
+            var sale_endVal   = $(sale_endSel).val();
             // var min_order  = $('input[name="' + 'ticket[' + clickID + '][min_order]' + '"]').val();
             // var max_order  = $('input[name="' + 'ticket[' + clickID + '][max_order]' + '"]').val();
 
-            $('.table-bordered#ticketTable tbody').append('<tr class="ID_' + clickID + '">' +
+            var isRequired = false;
+
+            if (!$.trim(sale_startVal)) {
+                $('.start_sales_' + clickID).attr('class', 'form-group saleTimePicker-start has-error start_sales_' + clickID);
+                $('.start_sales_' + clickID + ' .dtp_startSales').after('<label id="sale_start_' + clickID + '" class="control-label">請輸入開始時間</label>');
+                $('.start_sales_' + clickID + ' .dtp_startSales').focus();
+                isRequired = true;
+            } else{
+                $('.start_sales_' + clickID).attr('class', 'form-group saleTimePicker-start start_sales_' + clickID);
+                // console.log('sale_start_' + clickID);
+                $('#sale_start_' + clickID).remove();
+            };
+
+            if (!$.trim(sale_endVal)) {
+                $('.end_sales_' + clickID).attr('class', 'form-group saleTimePicker-end has-error end_sales_' + clickID);
+                $('.end_sales_' + clickID + ' .dtp_endSales').after('<label id="sale_end_' + clickID + '" class="control-label">請輸入開始時間</label>');
+                $('.end_sales_' + clickID + ' .dtp_endSales').focus();
+                isRequired = true;
+            } else{
+                $('.end_sales_' + clickID).attr('class', 'form-group saleTimePicker-end end_sales_' + clickID);
+                // console.log('sale_end_' + clickID);
+                $('#sale_end_' + clickID).remove();
+            };
+
+            if (!isRequired) {
+                $('.table-bordered#ticketTable tbody').append('<tr class="ID_' + clickID + '">' +
                                                     '<td>' + ticketName + '</td>' +
-                                                    '<td>' + sale_start + '~' + sale_end + '</td>' +
+                                                    '<td>' + sale_startVal + '~' + sale_endVal + '</td>' +
                                                     '<td>' + price + '</td>' +
                                                     '<td>' + quantity + '</td>' +
                                                     '<td class="editTable"><button type="button" class="btn btn-default" id="editTicket_' + clickID +'">編輯</button></td>' +
                                                 '</tr>'
-            );
+                );
 
-            $("#newTicket").attr('disabled', false);
-            $(".editTable button").attr('disabled', false);
-            // $("#SaveTicket_" + clickID).show();
-            // $("#AddTicket_" + clickID).hide();
-            $("#NewTicket_" + clickID).hide();
+                $("#newTicket").attr('disabled', false);
+                $(".editTable button").attr('disabled', false);
+                // $("#SaveTicket_" + clickID).show();
+                // $("#AddTicket_" + clickID).hide();
+                $("#NewTicket_" + clickID).hide();
+            };
         });
         
         // CancelTicket event
@@ -246,7 +391,7 @@
             var clickID = $(this).attr('id');
             clickID = clickID.slice(11);
             editID = clickID;
-            console.log('editTable:' + clickID);
+            // console.log('editTable:' + clickID);
             event.preventDefault();
             $("#AddTicket_" + clickID).hide();
             $("#SaveTicket_" + clickID).show();
@@ -262,29 +407,58 @@
             var clickID = $(this).attr('id');
             clickID = clickID.slice(11);
 
-            var ticketName = $('input[name="' + 'ticket[' + clickID + '][ticketName]' + '"]').val();
-            var quantity   = $('input[name="' + 'ticket[' + clickID + '][quantity]' + '"]').val();
-            var price      = $('input[name="' + 'ticket[' + clickID + '][price]' + '"]').val();
-            var sale_start = $('input[name="' + 'ticket[' + clickID + '][sale_start]' + '"]').val();
-            var sale_end   = $('input[name="' + 'ticket[' + clickID + '][sale_end]' + '"]').val();            
+            var sale_startSel = 'input[name="' + 'ticket[' + clickID + '][sale_start]' + '"]';
+            var sale_endSel   = 'input[name="' + 'ticket[' + clickID + '][sale_end]' + '"]';
             
-            $('#NewTicket_' + clickID).hide();
+            var ticketName    = $('input[name="' + 'ticket[' + clickID + '][ticketName]' + '"]').val();
+            var quantity      = $('input[name="' + 'ticket[' + clickID + '][quantity]' + '"]').val();
+            var price         = $('input[name="' + 'ticket[' + clickID + '][price]' + '"]').val();
+            var sale_startVal = $(sale_startSel).val();
+            var sale_endVal   = $(sale_endSel).val();
 
-            $('tr.ID_' + clickID).html('<td>' + ticketName + '</td>' +
-                                        '<td>' + sale_start + '~' + sale_end + '</td>' +
-                                        '<td>' + price + '</td>' +
-                                        '<td>' + quantity + '</td>' +
-                                        '<td class="editTable"><button type="button" class="btn btn-default" id="editTicket_' + clickID +'">編輯</button></td>'
-                                    );
-            $("#newTicket").attr('disabled', false);
-            $(".editTable button").attr('disabled', false);
+            var isRequired = false;
+
+            if (!$.trim(sale_startVal)) {
+                $('.start_sales_' + clickID).attr('class', 'form-group saleTimePicker-start has-error start_sales_' + clickID);
+                $('.start_sales_' + clickID + ' .dtp_startSales').after('<label id="sale_start_' + clickID + '" class="control-label">請輸入開始時間</label>');
+                $('.start_sales_' + clickID + ' .dtp_startSales').focus();
+                isRequired = true;
+            } else{
+                $('.start_sales_' + clickID).attr('class', 'form-group saleTimePicker-start start_sales_' + clickID);
+                // console.log('sale_start_' + clickID);
+                $('#sale_start_' + clickID).remove();
+            };
+
+            if (!$.trim(sale_endVal)) {
+                $('.end_sales_' + clickID).attr('class', 'form-group saleTimePicker-end has-error end_sales_' + clickID);
+                $('.end_sales_' + clickID + ' .dtp_endSales').after('<label id="sale_end_' + clickID + '" class="control-label">請輸入開始時間</label>');
+                $('.end_sales_' + clickID + ' .dtp_endSales').focus();
+                isRequired = true;
+            } else{
+                $('.end_sales_' + clickID).attr('class', 'form-group saleTimePicker-end end_sales_' + clickID);
+                // console.log('sale_end_' + clickID);
+                $('#sale_end_' + clickID).remove();
+            };
+            
+            if (!isRequired) {
+                $('#NewTicket_' + clickID).hide();
+
+                $('tr.ID_' + clickID).html('<td>' + ticketName + '</td>' +
+                                            '<td>' + sale_startVal + '~' + sale_endVal + '</td>' +
+                                            '<td>' + price + '</td>' +
+                                            '<td>' + quantity + '</td>' +
+                                            '<td class="editTable"><button type="button" class="btn btn-default" id="editTicket_' + clickID +'">編輯</button></td>'
+                                        );
+                $("#newTicket").attr('disabled', false);
+                $(".editTable button").attr('disabled', false);
+            };
         });
 
         // DeleteTicket event
         $('div#divEditTicket').on('click', 'button.DeleteTicket', function(event) {
             var clickID = $(this).attr('id');
             clickID = clickID.slice(13);
-            console.log('DeleteTicket:' + clickID);
+            // console.log('DeleteTicket:' + clickID);
             $('#NewTicket_' + clickID).remove();
             $('.ID_' + clickID).remove();
             $("#newTicket").attr('disabled', false);
@@ -292,15 +466,13 @@
         });
 
         var numberOfRows = $("div#divEditTicket .table-bordered>tbody>tr").length;
-        console.log(numberOfRows);
+        // console.log(numberOfRows);
         $("div#divEditTicket .table-bordered>tbody").bind("DOMSubtreeModified", function() {
             if($("div#divEditTicket .table-bordered>tbody>tr").length !== numberOfRows){
                 numberOfRows = $("div#divEditTicket .table-bordered>tbody>tr").length;
-                console.log('numberOfRows:' + numberOfRows);
+                // console.log('numberOfRows:' + numberOfRows);
             }
         });
-
-        
     });
     
     function PreviewImage() {
@@ -317,22 +489,22 @@
                 <div class="row" id="divEditEvent">
                     <div class="col-cg-6">
                     <h1>建立活動</h1>
-                        <div class="form-group">
-                            <label>活動名稱</label>
-                            <input class="form-control" name="event[activityName]" value="<?php echo @$this->event['name'] ?>">
+                        <div class="form-group activityName">
+                            <label class="control-label"><strong>*</strong>活動名稱</label>
+                            <input required class="form-control" name="event[activityName]" value="<?php echo @$this->event['name'] ?>">
                         </div>
-                        <div class="form-group">
-                            <label for="dtp_input1" class="col-md-2 control-label">活動開始時間</label>
-                            <div class="input-group date form_datetime col-md-5" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_input1">
+                        <div class="form-group start_time">
+                            <label for="dtp_input1" class="col-md-2 control-label"><strong>*</strong>活動開始時間</label>
+                            <div class="input-group date form_datetime form_datetime_dtp_input1 col-md-5" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_input1">
                                 <input class="form-control" size="16" type="text" value="<?php echo @$this->event['start_time'] ?> " readonly>
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                             </div>
                             <input type="hidden" id="dtp_input1" value="<?php echo @$this->event['start_time'] ?> " name="event[start_time]" /><br/>
                         </div>
-                        <div class="form-group">
-                            <label for="dtp_input2" class="col-md-2 control-label">活動結束時間</label>
-                            <div class="input-group date form_datetime col-md-5" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_input2">
+                        <div class="form-group end_time">
+                            <label for="dtp_input2" class="col-md-2 control-label"><strong>*</strong>活動結束時間</label>
+                            <div class="input-group date form_datetime form_datetime_dtp_input2 col-md-5" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_input2">
                                 <input class="form-control" size="16" type="text" value="<?php echo @$this->event['end_time'] ?> " readonly>
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
@@ -379,8 +551,8 @@
                             <input class="form-control" name="event[host]" value="<?php echo @$this->event['host'] ?>">
                         </div>
                         <div class="form-group">
-                            <label>活動人數</label>
-                            <input class="form-control" name="event[capacity]" value="<?php echo @$this->event['capacity'] ?>">
+                            <label><strong>*</strong>活動人數</label>
+                            <input required class="form-control" name="event[capacity]" value="<?php echo @$this->event['capacity'] ?>">
                         </div>
                         <div class="form-group">
                             <label>活動分類</label>
@@ -393,14 +565,14 @@
                             ?>
                         </div>
                         <div class="form-group">
-                            <label>活動描述</label>
-                            <textarea class="ckeditor" cols="80" id="editor1" name="event[description]" rows="10"><?php echo @$this->event['description'] ?> </textarea>    
+                            <label><strong>*</strong>活動描述</label>
+                            <textarea required class="ckeditor" cols="80" id="editor1" name="event[description]" rows="10"><?php echo @$this->event['description'] ?> </textarea>    
                         </div>
                         <div class="form-group">
                             <label>是否公開活動</label>
                             <?php $privacyKey = Zend_Registry::get('privacyKey'); ?>
                             <?php echo $this->formRadio('event[privacy]',
-                                                            @$this->event['privacy'],
+                                                            isset($this->event['privacy']) ? $this->event['privacy'] : '1',
                                                             array('label_class' => 'radio-inline'),
                                                            $privacyKey,
                                                            '<span></span>'
@@ -437,12 +609,12 @@
                       <tbody>
                         <?php if (isset($this->tickets)): ?>
                             <?php foreach ($this->tickets as $key => $ticket): ?>
-                            <tr class="<?php echo 'ID_' . ($key + 1) ?> ">
+                            <tr class="<?php echo 'ID_' . $ticket['ticket_id'] ?> ">
                                 <td><?php echo $ticket['ticketName'] ?></td>
                                 <td><?php echo $ticket['sale_start'] . '~' . $ticket['sale_end'] ?></td>
                                 <td><?php echo $ticket['price'] ?></td>
                                 <td><?php echo $ticket['quantity'] ?></td>
-                                <td class="editTable"><button type="button" class="btn btn-default" id="<?php echo 'editTicket_' . ($key + 1) ?>">編輯</button></td>
+                                <td class="editTable"><button type="button" class="btn btn-default" id="<?php echo 'editTicket_' . $ticket['ticket_id'] ?>">編輯</button></td>
                             </tr>
                             <?php endforeach ?>
                         <?php endif ?>
@@ -450,41 +622,41 @@
                     </table>
                     <?php if (isset($this->tickets)): ?>
                         <?php foreach ($this->tickets as $key => $ticket): ?>
-                            <div class="col-cg-6 bg-success" id="<?php echo 'NewTicket_' . ($key + 1)  ?>" style="display:none;">
+                            <div class="col-cg-6 bg-success" id="<?php echo 'NewTicket_' . $ticket['ticket_id']  ?>" style="display:none;">
                                 <div class="form-group">
-                                    <label>票種</label> <input class="form-control" type="text" id="ticc" name="ticket[<?php echo ($key + 1)  ?>][ticketName]" placeholder="例如：一般票、學生票" value="<?php echo $ticket['ticketName'] ?>"></div>
+                                    <label>票種</label> <input class="form-control" type="text" id="ticc" name="ticket[<?php echo $ticket['ticket_id']  ?>][ticketName]" placeholder="例如：一般票、學生票" value="<?php echo $ticket['ticketName'] ?>"></div>
                                 <div class="form-group">
-                                    <label>數量</label> <input class="form-control" name="ticket[<?php echo ($key + 1)  ?>][quantity]" placeholder="票種總和不可多於活動參加人數" value="<?php echo $ticket['quantity'] ?>"> </div>
-                                <div class="form-group"> <label>售價</label> <input class="form-control" name="ticket[<?php echo ($key + 1)  ?>][price]" placeholder="單張票價" value="<?php echo $ticket['price'] ?>"> </div>
+                                    <label>數量</label> <input class="form-control" name="ticket[<?php echo $ticket['ticket_id']  ?>][quantity]" placeholder="票種總和不可多於活動參加人數" value="<?php echo $ticket['quantity'] ?>"> </div>
+                                <div class="form-group"> <label>售價</label> <input class="form-control" name="ticket[<?php echo $ticket['ticket_id']  ?>][price]" placeholder="單張票價" value="<?php echo $ticket['price'] ?>"> </div>
                                 <span id="spanNewTicket">
                                     <span class="saleTimePicker" style="">
-                                        <div class="form-group saleTimePicker-start">
-                                            <label for="dtp_startSales" class="col-md-2 control-label">販售開始時間</label>
-                                            <div class="input-group date form_datetime form_datetime_start_sales col-md-5" data-date="" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_startSales" id="Div_dtp_startSales">
+                                        <div class="form-group saleTimePicker-start start_sales_<?php echo $ticket['ticket_id'] ?>">
+                                            <label for="dtp_startSales<?php echo $ticket['ticket_id'] ?>" class="col-md-2 control-label">販售開始時間</label>
+                                            <div class="input-group date form_datetime form_datetime_start_sales col-md-5" data-date="" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_startSales<?php echo $ticket['ticket_id'] ?>" id="Div_dtp_startSales_<?php echo $ticket['ticket_id'] ?>">
                                                 <input class="form-control" size="16" type="text" value="<?php echo $ticket['sale_start'] ?>" readonly>
                                                 <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                             </div>
-                                            <input type="hidden" class="dtp_startSales" id="dtp_startSales" value="<?php echo $ticket['sale_start'] ?>" /><br/>
-                                            <input type="hidden" id="dtp_startSales_<?php echo ($key + 1)  ?>" name="ticket[<?php echo ($key + 1)  ?>][sale_start]" value="<?php echo $ticket['sale_start'] ?>" />
+                                            <input type="hidden" class="dtp_startSales<?php echo $ticket['ticket_id'] ?>" id="dtp_startSales<?php echo $ticket['ticket_id'] ?>" value="<?php echo $ticket['sale_start'] ?>" /><br/>
+                                            <input type="hidden" id="dtp_startSales_<?php echo $ticket['ticket_id']  ?>" name="ticket[<?php echo $ticket['ticket_id']  ?>][sale_start]" value="<?php echo $ticket['sale_start'] ?>" />
                                         </div>
-                                        <div class="form-group saleTimePicker-end">
-                                            <label for="dtp_endSales" class="col-md-2 control-label">販售結束時間</label>
-                                            <div class="input-group date form_datetime form_datetime_end_sales col-md-5" data-date="" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_endSales" id="Div_dtp_endSales">
+                                        <div class="form-group saleTimePicker-end end_sales_<?php echo $ticket['ticket_id'] ?>">
+                                            <label for="dtp_endSales<?php echo $ticket['ticket_id'] ?>" class="col-md-2 control-label">販售結束時間</label>
+                                            <div class="input-group date form_datetime form_datetime_end_sales col-md-5" data-date="" data-date-format="yyyy MM dd - p HH:ii" data-link-field="dtp_endSales<?php echo $ticket['ticket_id'] ?>" id="Div_dtp_endSales_<?php echo $ticket['ticket_id'] ?>">
                                                 <input class="form-control" size="16" type="text" value="<?php echo $ticket['sale_end'] ?>" readonly>
                                                 <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                             </div>
-                                            <input type="hidden" class="dtp_endSales" id="dtp_endSales" value="<?php echo $ticket['sale_end'] ?>" /><br/>
-                                            <input type="hidden" id="dtp_endSales_<?php echo ($key + 1)  ?>" name="ticket[<?php echo ($key + 1)  ?>][sale_end]" value="<?php echo $ticket['sale_end'] ?>" />
+                                            <input type="hidden" class="dtp_endSales<?php echo $ticket['ticket_id'] ?>" id="dtp_endSales<?php echo $ticket['ticket_id'] ?>" value="<?php echo $ticket['sale_end'] ?>" /><br/>
+                                            <input type="hidden" id="dtp_endSales_<?php echo $ticket['ticket_id']  ?>" name="ticket[<?php echo $ticket['ticket_id']  ?>][sale_end]" value="<?php echo $ticket['sale_end'] ?>" />
                                         </div>
                                     </span>
                                 </span>
                                     
-                                <div class="form-group"> <label>最少訂購數量</label> <select class="form-control" name="ticket[<?php echo ($key + 1)  ?>][min_order]"> <option>1</option> <option>2</option> <option>3</option> </select> </div>
-                                <div class="form-group"> <label>最多訂購數量</label> <select class="form-control" name="ticket[<?php echo ($key + 1)  ?>][max_order]"> <option>1</option> <option>2</option> <option>3</option> </select> </div>
+                                <div class="form-group"> <label>最少訂購數量</label> <select class="form-control" name="ticket[<?php echo $ticket['ticket_id']  ?>][min_order]"> <option>1</option> <option>2</option> <option>3</option> </select> </div>
+                                <div class="form-group"> <label>最多訂購數量</label> <select class="form-control" name="ticket[<?php echo $ticket['ticket_id']  ?>][max_order]"> <option>1</option> <option>2</option> <option>3</option> </select> </div>
                                 
-                                <button class="btn btn-default SaveTicket" id="SaveTicket_<?php echo ($key + 1)  ?>" type="button" style="" class="btn btn-default">存檔</button>
+                                <button class="btn btn-default SaveTicket" id="SaveTicket_<?php echo $ticket['ticket_id']  ?>" type="button" style="" class="btn btn-default">存檔</button>
                             </div>
                         <?php endforeach ?>    
                     <?php endif ?>
