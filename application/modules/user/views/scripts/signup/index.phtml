@@ -98,8 +98,11 @@
                 <input type="hidden" value="<?php echo $this->captchaId?>" name="captchaword[id]" />
             </div>
             <br>
-            <?php echo $this->formCheckbox('agree', NULL, array('class' => 'agree form-control', 'required' => '', 'checked' => (bool)($this->messages['agree']))) ?>
-            <span>我同意<a href="#">服務條款</a>及<a href="#">隱私權政策</a></span>
+            <label for=""><?php echo $this->formCheckbox('agree', NULL, array('class' => 'agree',
+                                                                            'required' => '',
+                                                                            'checked'  => (bool)($this->messages['agree']))) 
+                         ?>
+                <span>我同意<a href="#">服務條款</a>及<a href="#">隱私權政策</a></span></label>
             <?php 
                 if (isset($this->signupStatus)) {
                 echo '<div class="form-group has-error">';
