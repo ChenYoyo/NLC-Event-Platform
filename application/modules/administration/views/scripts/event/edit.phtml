@@ -15,14 +15,167 @@
             $("#divEditForm").hide();
         });
 
-        $("#editTicket").click(function(event) {
-            var activitySel = "input[name='event[activityName]']";
-            var start_timeSel = "input[name='event[start_time]']";
-            var end_timeSel = "input[name='event[end_time]']";
+        function getClickID (editID) {
+            var clickID;
 
-            var activityValue = $(activitySel).val();
-            var start_timeValue = $(start_timeSel).val();
-            var end_timeValue = $(end_timeSel).val();
+            if ( $("div[id^='NewTicket_'][style^='display: block;'] .form_datetime_start_sales").length === 0){
+                clickID = editID;
+            }else{
+                clickID = $("div[id^='NewTicket_'][style^='display: block;'] .form_datetime_start_sales").parent().attr('class').match(/form-group saleTimePicker-start start_sales_(\d)/)[1];
+            }
+
+            return clickID;
+        }
+
+        function dtpEndsalesUpdate (editID) {
+            var clickID = getClickID(editID);
+
+            var end_sales     = '.saleTimePicker-end.end_sales_' + clickID;
+            var endSales_time = $(end_sales + ' .dtp_endSales' + clickID).val();
+            var endSalesID    = '#dtp_endSales_' + clickID;
+            // id = $('.table tbody tr').length + 1;
+
+            if ($(endSalesID).length > 0) {
+                // hidden value exists
+                $(endSalesID).val(endSales_time);
+            } else{
+                $(end_sales).append('<input type="hidden" id="dtp_endSales_' + clickID + '" name="ticket[' + clickID + '][sale_end]" value="' + endSales_time + '" />');
+            }
+        }
+
+        function dtpStartsalesUpdate (editID) {
+            var clickID = getClickID(editID);
+
+            var start_sales = '.saleTimePicker-start.start_sales_' + clickID;
+            var end_sales   = '.saleTimePicker-end.end_sales_' + clickID;
+
+            var startSalesID    = '#dtp_startSales_' + clickID;
+            var endSalesID      = '#dtp_endSales_' + clickID;
+            var startSales_time = $(start_sales + ' .dtp_startSales' + clickID).val();
+            var endSales_time   = $(end_sales + ' .dtp_endSales' + clickID).val();
+            var dtp_end         = '.end_sales_' + clickID + ' .form_datetime_end_sales';
+            $(dtp_end).datetimepicker('setStartDate', startSales_time);
+
+            if ($(startSalesID).length > 0) {
+                // hidden value exists
+                $(startSalesID).val(startSales_time);
+            } else{
+                $(start_sales).append('<input type="hidden" id="dtp_startSales_' + clickID + '" name="ticket[' + clickID + '][sale_start]" value="' + startSales_time + '" />');
+            }
+
+            if (startSales_time > endSales_time) {
+                $(dtp_end).datetimepicker('update', startSales_time);
+                if ($(endSalesID).length > 0) {
+                    // hidden value exists
+                    $(endSalesID).val(startSales_time);
+                } else{
+                    $(end_sales).append('<input type="hidden" id="dtp_endSales_' + clickID + '" name="ticket[' + clickID + '][sale_end]" value="' + startSales_time + '" />');
+                }
+            };
+        }
+
+        function ticketValidation (selector) {
+            var clickID = selector.attr('id').match(/(\d)/)[0];
+            var sale_startSel = 'input[name="' + 'ticket[' + clickID + '][sale_start]' + '"]';
+            var sale_endSel   = 'input[name="' + 'ticket[' + clickID + '][sale_end]' + '"]';
+            var ticketNameSel = 'input[name="' + 'ticket[' + clickID + '][ticketName]' + '"]';
+            var quantitySel   = 'input[name="' + 'ticket[' + clickID + '][quantity]' + '"]';
+            var priceSel      = 'input[name="' + 'ticket[' + clickID + '][price]' + '"]';
+
+            var ticketNameVal = $(ticketNameSel).val();
+            var quantityVal   = $(quantitySel).val();
+            var priceVal      = $(priceSel).val();
+            var sale_startVal = $(sale_startSel).val();
+            var sale_endVal   = $(sale_endSel).val();
+
+            var quantityValidate = new RegExp(/^[1-9](\d{0,3}$)/);
+            var priceValidate = new RegExp(/^[1-9](\d)*/ | 0);
+            var isRequired = false;
+
+            if (!$.trim(ticketNameVal)) {
+                $('.ticketName_' + clickID).attr('class', 'form-group ticketName_' + clickID + ' has-error');
+                $('.ticketName_' + clickID + ' input').after('<label id="ticketName_' + clickID + '" class="control-label">請輸入票種名稱</label>');
+
+                $('html, body').animate({
+                    scrollTop: $("input[name='ticket["+ clickID +"][ticketName]']").offset().top
+                }, 1000);
+                isRequired = true;
+            } else{
+                $('.ticketName_' + clickID).attr('class', 'form-group ticketName_' + clickID);
+                $('#ticketName_' + clickID).remove();
+            };
+
+            if (!$.trim(quantityVal) ||
+                !quantityValidate.test(quantityVal)) {
+                $('.quantity_' + clickID).attr('class', 'form-group quantity_' + clickID + ' has-error');
+                $('.quantity_' + clickID + ' input').after('<label id="quantity_' + clickID + '" class="control-label">請輸入數量1~9999</label>');
+
+                $('html, body').animate({
+                    scrollTop: $("input[name='ticket["+ clickID +"][ticketName]']").offset().top
+                }, 1000);
+                isRequired = true;
+            } else{
+                $('.quantity_' + clickID).attr('class', 'form-group quantity_' + clickID);
+                $('#quantity_' + clickID).remove();
+            };
+
+            if (!$.trim(priceVal) ||
+                !priceValidate.test(priceVal)) {
+                $('.price_' + clickID).attr('class', 'form-group price_' + clickID + ' has-error');
+                $('.price_' + clickID + ' input').after('<label id="price_' + clickID + '" class="control-label">請輸入售價0元以上</label>');
+
+                $('html, body').animate({
+                    scrollTop: $("input[name='ticket["+ clickID +"][quantity]']").offset().top
+                }, 1000);
+                isRequired = true;
+            } else{
+                $('.price_' + clickID).attr('class', 'form-group price_' + clickID);
+                $('#price_' + clickID).remove();
+            };
+
+            if (!$.trim(sale_startVal)) {
+                $('.start_sales_' + clickID).attr('class', 'form-group saleTimePicker-start has-error start_sales_' + clickID);
+                $('.start_sales_' + clickID + ' .dtp_startSales' + clickID).after('<label id="sale_start_' + clickID + '" class="control-label">請輸入開始時間</label>');
+                $('.start_sales_' + clickID + ' .dtp_startSales' + clickID).focus();
+                isRequired = true;
+            } else{
+                $('.start_sales_' + clickID).attr('class', 'form-group saleTimePicker-start start_sales_' + clickID);
+                // console.log('sale_start_' + clickID);
+                $('#sale_start_' + clickID).remove();
+            };
+
+            if (!$.trim(sale_endVal)) {
+                $('.end_sales_' + clickID).attr('class', 'form-group saleTimePicker-end has-error end_sales_' + clickID);
+                $('.end_sales_' + clickID + ' .dtp_endSales' + clickID).after('<label id="sale_end_' + clickID + '" class="control-label">請輸入開始時間</label>');
+                $('.end_sales_' + clickID + ' .dtp_endSales' + clickID).focus();
+                isRequired = true;
+            } else{
+                $('.end_sales_' + clickID).attr('class', 'form-group saleTimePicker-end end_sales_' + clickID);
+                // console.log('sale_end_' + clickID);
+                $('#sale_end_' + clickID).remove();
+            };
+
+            return {
+                "clickID"      : clickID,
+                "isRequired"   : isRequired,
+                "ticketNameVal": ticketNameVal,
+                "quantityVal"  : quantityVal,
+                "priceVal"     : priceVal,
+                "sale_startVal": sale_startVal,
+                "sale_endVal"  : sale_endVal
+            };            
+        }
+
+        $("#editTicket").click(function(event) {
+            var activitySel    = "input[name='event[activityName]']";
+            var start_timeSel  = "input[name='event[start_time]']";
+            var end_timeSel    = "input[name='event[end_time]']";
+            var descriptionSel = "textarea[name='event[description]']";
+
+            var activityValue    = $(activitySel).val();
+            var start_timeValue  = $(start_timeSel).val();
+            var end_timeValue    = $(end_timeSel).val();
+            var descriptionValue = $("#cke_editor1 iframe").contents().find("body").text();
 
             var isRequired = false;
 
@@ -39,7 +192,10 @@
             if (!$.trim(start_timeValue)) {
                 $('.start_time').attr('class', 'form-group start_time has-error');
                 $(start_timeSel).after('<label id="start_time" class="control-label">請輸入開始時間</label>');
-                $(start_timeSel).focus();
+                // $(start_timeSel).focus();
+                $('html, body').animate({
+                    scrollTop: $(activitySel).offset().top
+                }, 1000);
                 isRequired = true;
             } else{
                 $('.start_time').attr('class', 'form-group start_time');
@@ -49,11 +205,24 @@
             if (!$.trim(end_timeValue)) {
                 $('.end_time').attr('class', 'form-group end_time has-error');
                 $(end_timeSel).after('<label id="end_time" class="control-label">請輸入結束時間</label>');
-                $(end_timeSel).focus();
+                // $(end_timeSel).focus();
                 isRequired = true;
             } else{
                 $('.end_time').attr('class', 'form-group end_time');
                 $('#end_time').remove();
+            };
+
+            if (!$.trim(descriptionValue)) {
+                $('.description').attr('class', 'form-group description has-error');
+                $(descriptionSel).after('<label id="description" class="control-label">請輸入</label>');
+                // $(descriptionSel).focus();
+                $('html, body').animate({
+                    scrollTop: $('#event-category').offset().top
+                }, 1000);
+                isRequired = true;
+            } else{
+                $('.description').attr('class', 'form-group description');
+                $("#description").remove();
             };
             
             if (!isRequired) {
@@ -70,9 +239,18 @@
         });
 
         $("#editForm").click(function(event) {
-            $("#divEditEvent").hide();
-            $("#divEditTicket").hide();
-            $("#divEditForm").show();
+            if ($(".editTable").length > 0) {
+                $("#divEditEvent").hide();
+                $("#divEditTicket").hide();
+                $("#divEditForm").show();
+                $("#newTicket").parent().attr('class', "form-group");
+                $("#newTicket").next().remove();
+                $('#newTicket').attr('class', 'btn btn-default');
+            } else{
+                $("#newTicket").parent().attr('class', "form-group has-error");
+                $("#newTicket").after('<label class="control-label" for="inputError1">請至少設定一張票種</label>');
+                $('#newTicket').attr('class', 'btn btn-danger');
+            };
         });
 
         var today = new Date();
@@ -129,62 +307,11 @@
         });
 
         $('.form_datetime_start_sales').on('hide', function  (event) {
-            var clickID;
-            
-            if ( $("div[id^='NewTicket_'][style^='display: block;'] .form_datetime_start_sales").length === 0){
-                clickID = editID;
-            }else{
-                 clickID = $("div[id^='NewTicket_'][style^='display: block;'] .form_datetime_start_sales").parent().attr('class').match(/form-group saleTimePicker-start start_sales_(\d)/)[1];
-            }
-            var start_sales = '.saleTimePicker-start.start_sales_' + clickID;
-            var end_sales = '.saleTimePicker-end.end_sales_' + clickID;
-
-            var startSalesID    = '#dtp_startSales_' + clickID;
-            var endSalesID      = '#dtp_endSales_' + clickID;
-            var startSales_time = $(start_sales + ' .dtp_startSales' + clickID).val();
-            var endSales_time   = $(end_sales + ' .dtp_endSales' + clickID).val();
-            var dtp_end = '.end_sales_' + clickID + ' .form_datetime_end_sales';
-            $(dtp_end).datetimepicker('setStartDate', startSales_time);
-
-            // console.log('clickID:' + clickID);
-            // console.log('startSales_time' + startSales_time);
-            if ($(startSalesID).length > 0) {
-                // hidden value exists
-                $(startSalesID).val(startSales_time);
-            } else{
-                $(start_sales).append('<input type="hidden" id="dtp_startSales_' + clickID + '" name="ticket[' + clickID + '][sale_start]" value="' + startSales_time + '" />');
-            }
-
-            if (startSales_time > endSales_time) {
-                $(dtp_end).datetimepicker('update', startSales_time);
-                if ($(endSalesID).length > 0) {
-                    // hidden value exists
-                    $(endSalesID).val(startSales_time);
-                } else{
-                    $(end_sales).append('<input type="hidden" id="dtp_endSales_' + clickID + '" name="ticket[' + clickID + '][sale_end]" value="' + startSales_time + '" />');
-                }
-            };
+            dtpStartsalesUpdate(editID);
         });
 
         $('.form_datetime_end_sales').on('hide', function  (event) {
-            var clickID;
-            clickID = editID;
-            if ( $("div[id^='NewTicket_'][style^='display: block;'] .form_datetime_start_sales").length === 0){
-                clickID = editID;
-            }else{
-                 clickID = $("div[id^='NewTicket_'][style^='display: block;'] .form_datetime_start_sales").parent().attr('class').match(/form-group saleTimePicker-start start_sales_(\d)/)[1];
-            }
-            var end_sales = '.saleTimePicker-end.end_sales_' + clickID;
-            var endSales_time   = $(end_sales + ' .dtp_endSales' + clickID).val();
-            var endSalesID = '#dtp_endSales_' + clickID;
-            // id = $('.table tbody tr').length + 1;
-
-            if ($(endSalesID).length > 0) {
-                // hidden value exists
-                $(endSalesID).val(endSales_time);
-            } else{
-                $(end_sales).append('<input type="hidden" id="dtp_endSales_' + clickID + '" name="ticket[' + clickID + '][sale_end]" value="' + endSales_time + '" />');
-            }
+            dtpEndsalesUpdate(editID);
         });
 
         $('#newTicket').click(function(event) {
@@ -197,11 +324,11 @@
             // console.log('newticket' + id);
 
             $("div#divEditTicket table").after('<div class="col-cg-6 bg-success" id="NewTicket_' + id +'">' + 
-                '<div class="form-group">' + 
-                    '<label>票種</label> <input class="form-control" type="text" id="ticc" name="ticket[' + id + '][ticketName]" placeholder="例如：一般票、學生票"></div>' + 
-                '<div class="form-group">' + 
-                    '<label>數量</label> <input class="form-control" name="ticket[' + id + '][quantity]" placeholder="票種總和不可多於活動參加人數"> </div>' + 
-                '<div class="form-group"> <label>售價</label> <input class="form-control" name="ticket[' + id + '][price]" placeholder="單張票價"> </div>' +
+                '<div class="form-group ticketName_' + id + '">' + 
+                    '<label class="control-label">票種</label> <input class="form-control" type="text" id="ticc" name="ticket[' + id + '][ticketName]" placeholder="例如：一般票、學生票"></div>' + 
+                '<div class="form-group quantity_' + id + '">' + 
+                    '<label class="control-label">數量</label> <input class="form-control" name="ticket[' + id + '][quantity]" placeholder="票種總和不可多於活動參加人數"> </div>' + 
+                '<div class="form-group price_' + id + '"> <label class="control-label">售價</label> <input class="form-control" name="ticket[' + id + '][price]" placeholder="單張票價"> </div>' +
                 '<span id="spanNewTicket">' +
                     '<span class="saleTimePicker" style="display:none;">' +
                         '<div class="form-group saleTimePicker-start start_sales_' + id + '">' +
@@ -262,107 +389,25 @@
             $(".editTable button").attr('disabled', true);
 
             $('.form_datetime_start_sales').on('hide', function  (event) {
-                var clickID;
-                if ( $("div[id^='NewTicket_'][style^='display: block;'] .form_datetime_start_sales").length === 0){
-                    clickID = id;
-                }else{
-                     clickID = $("div[id^='NewTicket_'][style^='display: block;'] .form_datetime_start_sales").parent().attr('class').match(/form-group saleTimePicker-start start_sales_(\d)/)[1];
-                }
-                var start_sales = '.saleTimePicker-start.start_sales_' + clickID;
-                var end_sales = '.saleTimePicker-end.end_sales_' + clickID;
-
-                var startSalesID    = '#dtp_startSales_' + clickID;
-                var endSalesID      = '#dtp_endSales_' + clickID;
-                var startSales_time = $(start_sales + ' .dtp_startSales' + clickID).val();
-                var endSales_time   = $(end_sales + ' .dtp_endSales' + clickID).val();
-                var dtp_end = '.end_sales_' + clickID + ' .form_datetime_end_sales';
-                $(dtp_end).datetimepicker('setStartDate', startSales_time);
-                if ($(startSalesID).length > 0) {
-                    // hidden value exists
-                    $(startSalesID).val(startSales_time);
-                } else{
-                    $(start_sales).append('<input type="hidden" id="dtp_startSales_' + clickID + '" name="ticket[' + clickID + '][sale_start]" value="' + startSales_time + '" />');
-                }
-
-                if (startSales_time > endSales_time) {
-                    $(dtp_end).datetimepicker('update', startSales_time);
-                    if ($(endSalesID).length > 0) {
-                        // hidden value exists
-                        $(endSalesID).val(startSales_time);
-                    } else{
-                        $(end_sales).append('<input type="hidden" id="dtp_endSales_' + clickID + '" name="ticket[' + clickID + '][sale_end]" value="' + startSales_time + '" />');
-                    }
-                };
+                dtpStartsalesUpdate(id);
             });
 
             $('.form_datetime_end_sales').on('hide', function  (event) {
-                var clickID;
-                if ( $("div[id^='NewTicket_'][style^='display: block;'] .form_datetime_start_sales").length === 0){
-                    clickID = id;
-                }else{
-                     clickID = $("div[id^='NewTicket_'][style^='display: block;'] .form_datetime_start_sales").parent().attr('class').match(/form-group saleTimePicker-start start_sales_(\d)/)[1];
-                }
-                var end_sales = '.saleTimePicker-end.end_sales_' + clickID;
-                var endSales_time   = $(end_sales + ' .dtp_endSales' + clickID).val();
-                var endSalesID = '#dtp_endSales_' + clickID;
-                // id = $('.table tbody tr').length + 1;
-
-                if ($(endSalesID).length > 0) {
-                    // hidden value exists
-                    $(endSalesID).val(endSales_time);
-                } else{
-                    $(end_sales).append('<input type="hidden" id="dtp_endSales_' + clickID + '" name="ticket[' + clickID + '][sale_end]" value="' + endSales_time + '" />');
-                }
+                dtpEndsalesUpdate(id);
             });
         });
         
         // AddTicket event
         $('div#divEditTicket').on("click", 'button.AddTicket', function(){
-            var clickID = $(this).attr('id');
-            clickID = clickID.slice(10);
+            var ticketVal = ticketValidation($(this));
 
-            var sale_startSel = 'input[name="' + 'ticket[' + clickID + '][sale_start]' + '"]';
-            var sale_endSel   = 'input[name="' + 'ticket[' + clickID + '][sale_end]' + '"]';
-
-            var ticketName    = $('input[name="' + 'ticket[' + clickID + '][ticketName]' + '"]').val();
-            var quantity      = $('input[name="' + 'ticket[' + clickID + '][quantity]' + '"]').val();
-            var price         = $('input[name="' + 'ticket[' + clickID + '][price]' + '"]').val();
-            var sale_startVal = $(sale_startSel).val();
-            var sale_endVal   = $(sale_endSel).val();
-            // var min_order  = $('input[name="' + 'ticket[' + clickID + '][min_order]' + '"]').val();
-            // var max_order  = $('input[name="' + 'ticket[' + clickID + '][max_order]' + '"]').val();
-
-            var isRequired = false;
-
-            if (!$.trim(sale_startVal)) {
-                $('.start_sales_' + clickID).attr('class', 'form-group saleTimePicker-start has-error start_sales_' + clickID);
-                $('.start_sales_' + clickID + ' .dtp_startSales').after('<label id="sale_start_' + clickID + '" class="control-label">請輸入開始時間</label>');
-                $('.start_sales_' + clickID + ' .dtp_startSales').focus();
-                isRequired = true;
-            } else{
-                $('.start_sales_' + clickID).attr('class', 'form-group saleTimePicker-start start_sales_' + clickID);
-                // console.log('sale_start_' + clickID);
-                $('#sale_start_' + clickID).remove();
-            };
-
-            if (!$.trim(sale_endVal)) {
-                $('.end_sales_' + clickID).attr('class', 'form-group saleTimePicker-end has-error end_sales_' + clickID);
-                $('.end_sales_' + clickID + ' .dtp_endSales').after('<label id="sale_end_' + clickID + '" class="control-label">請輸入開始時間</label>');
-                $('.end_sales_' + clickID + ' .dtp_endSales').focus();
-                isRequired = true;
-            } else{
-                $('.end_sales_' + clickID).attr('class', 'form-group saleTimePicker-end end_sales_' + clickID);
-                // console.log('sale_end_' + clickID);
-                $('#sale_end_' + clickID).remove();
-            };
-
-            if (!isRequired) {
-                $('.table-bordered#ticketTable tbody').append('<tr class="ID_' + clickID + '">' +
-                                                    '<td>' + ticketName + '</td>' +
-                                                    '<td>' + sale_startVal + '~' + sale_endVal + '</td>' +
-                                                    '<td>' + price + '</td>' +
-                                                    '<td>' + quantity + '</td>' +
-                                                    '<td class="editTable"><button type="button" class="btn btn-default" id="editTicket_' + clickID +'">編輯</button></td>' +
+            if (!ticketVal.isRequired) {
+                $('.table-bordered#ticketTable tbody').append('<tr class="ID_' + ticketVal.clickID + '">' +
+                                                    '<td>' + ticketVal.ticketNameVal + '</td>' +
+                                                    '<td>' + ticketVal.sale_startVal + '~' + ticketVal.sale_endVal + '</td>' +
+                                                    '<td>' + ticketVal.priceVal + '</td>' +
+                                                    '<td>' + ticketVal.quantityVal + '</td>' +
+                                                    '<td class="editTable"><button type="button" class="btn btn-default" id="editTicket_' + ticketVal.clickID +'">編輯</button></td>' +
                                                 '</tr>'
                 );
 
@@ -370,7 +415,7 @@
                 $(".editTable button").attr('disabled', false);
                 // $("#SaveTicket_" + clickID).show();
                 // $("#AddTicket_" + clickID).hide();
-                $("#NewTicket_" + clickID).hide();
+                $("#NewTicket_" + ticketVal.clickID).hide();
             };
         });
         
@@ -404,50 +449,16 @@
 
         // SaveTicket event
         $('div#divEditTicket').on('click', 'button.SaveTicket', function(event) {
-            var clickID = $(this).attr('id');
-            clickID = clickID.slice(11);
+            var ticketVal = ticketValidation($(this));
 
-            var sale_startSel = 'input[name="' + 'ticket[' + clickID + '][sale_start]' + '"]';
-            var sale_endSel   = 'input[name="' + 'ticket[' + clickID + '][sale_end]' + '"]';
-            
-            var ticketName    = $('input[name="' + 'ticket[' + clickID + '][ticketName]' + '"]').val();
-            var quantity      = $('input[name="' + 'ticket[' + clickID + '][quantity]' + '"]').val();
-            var price         = $('input[name="' + 'ticket[' + clickID + '][price]' + '"]').val();
-            var sale_startVal = $(sale_startSel).val();
-            var sale_endVal   = $(sale_endSel).val();
+            if (!ticketVal.isRequired) {
+                $('#NewTicket_' + ticketVal.clickID).hide();
 
-            var isRequired = false;
-
-            if (!$.trim(sale_startVal)) {
-                $('.start_sales_' + clickID).attr('class', 'form-group saleTimePicker-start has-error start_sales_' + clickID);
-                $('.start_sales_' + clickID + ' .dtp_startSales').after('<label id="sale_start_' + clickID + '" class="control-label">請輸入開始時間</label>');
-                $('.start_sales_' + clickID + ' .dtp_startSales').focus();
-                isRequired = true;
-            } else{
-                $('.start_sales_' + clickID).attr('class', 'form-group saleTimePicker-start start_sales_' + clickID);
-                // console.log('sale_start_' + clickID);
-                $('#sale_start_' + clickID).remove();
-            };
-
-            if (!$.trim(sale_endVal)) {
-                $('.end_sales_' + clickID).attr('class', 'form-group saleTimePicker-end has-error end_sales_' + clickID);
-                $('.end_sales_' + clickID + ' .dtp_endSales').after('<label id="sale_end_' + clickID + '" class="control-label">請輸入開始時間</label>');
-                $('.end_sales_' + clickID + ' .dtp_endSales').focus();
-                isRequired = true;
-            } else{
-                $('.end_sales_' + clickID).attr('class', 'form-group saleTimePicker-end end_sales_' + clickID);
-                // console.log('sale_end_' + clickID);
-                $('#sale_end_' + clickID).remove();
-            };
-            
-            if (!isRequired) {
-                $('#NewTicket_' + clickID).hide();
-
-                $('tr.ID_' + clickID).html('<td>' + ticketName + '</td>' +
-                                            '<td>' + sale_startVal + '~' + sale_endVal + '</td>' +
-                                            '<td>' + price + '</td>' +
-                                            '<td>' + quantity + '</td>' +
-                                            '<td class="editTable"><button type="button" class="btn btn-default" id="editTicket_' + clickID +'">編輯</button></td>'
+                $('tr.ID_' + ticketVal.clickID).html('<td>' + ticketVal.ticketNameVal + '</td>' +
+                                            '<td>' + ticketVal.sale_startVal + '~' + ticketVal.sale_endVal + '</td>' +
+                                            '<td>' + ticketVal.priceVal + '</td>' +
+                                            '<td>' + ticketVal.quantityVal + '</td>' +
+                                            '<td class="editTable"><button type="button" class="btn btn-default" id="editTicket_' + ticketVal.clickID +'">編輯</button></td>'
                                         );
                 $("#newTicket").attr('disabled', false);
                 $(".editTable button").attr('disabled', false);
@@ -465,14 +476,15 @@
             $(".editTable button").attr('disabled', false);
         });
 
-        var numberOfRows = $("div#divEditTicket .table-bordered>tbody>tr").length;
+        //  this function is used for detecting table's row number.
+        // var numberOfRows = $("div#divEditTicket .table-bordered>tbody>tr").length;
         // console.log(numberOfRows);
-        $("div#divEditTicket .table-bordered>tbody").bind("DOMSubtreeModified", function() {
-            if($("div#divEditTicket .table-bordered>tbody>tr").length !== numberOfRows){
-                numberOfRows = $("div#divEditTicket .table-bordered>tbody>tr").length;
-                // console.log('numberOfRows:' + numberOfRows);
-            }
-        });
+        // $("div#divEditTicket .table-bordered>tbody").bind("DOMSubtreeModified", function() {
+        //     if($("div#divEditTicket .table-bordered>tbody>tr").length !== numberOfRows){
+        //         numberOfRows = $("div#divEditTicket .table-bordered>tbody>tr").length;
+        //         console.log('numberOfRows:' + numberOfRows);
+        //     }
+        // });
     });
     
     function PreviewImage() {
@@ -550,10 +562,10 @@
                             <label>主辦人</label>
                             <input class="form-control" name="event[host]" value="<?php echo @$this->event['host'] ?>">
                         </div>
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label><strong>*</strong>活動人數</label>
-                            <input required class="form-control" name="event[capacity]" value="<?php echo @$this->event['capacity'] ?>">
-                        </div>
+                            <input required class="form-control" name="event[capacity]" value="<?php //echo @$this->event['capacity'] ?>">
+                        </div> -->
                         <div class="form-group">
                             <label>活動分類</label>
                             <?php $categoryKey = Zend_Registry::get('categoryKey'); ?>
@@ -564,9 +576,9 @@
                                                 )
                             ?>
                         </div>
-                        <div class="form-group">
-                            <label><strong>*</strong>活動描述</label>
-                            <textarea required class="ckeditor" cols="80" id="editor1" name="event[description]" rows="10"><?php echo @$this->event['description'] ?> </textarea>    
+                        <div class="form-group description">
+                            <label class="control-label"><strong>*</strong>活動描述</label>
+                            <textarea required class="ckeditor form-control" cols="80" id="editor1" name="event[description]" rows="10"><?php echo @$this->event['description'] ?> </textarea>    
                         </div>
                         <div class="form-group">
                             <label>是否公開活動</label>
@@ -580,10 +592,20 @@
                             ?>
                         </div>
                         <div class="form-group">
-                            <label>活動分享圖片</label>
+                            <dl>
+                              <dt>活動分享圖片
+                              </dt>
+                              <dd>
+                                <ol>
+                                    <li>上傳的格式包含 JPEG、PNG、GIF</li>
+                                    <li>上傳最大檔案容量為2.5MB。</li>
+                                    <li>如果沒有上傳或是上傳失敗，會使用系統預設圖片。</li>
+                                </ol>
+                              </dd>
+                            </dl>
                             <img src="<?php echo isset($this->event['image']) ? 
                                                         '/img/' . $this->event['image'] :
-                                                         'http://placehold.it/200x200' ?>" 
+                                                         'http://placehold.it/300x300' ?>" 
                              class="img-responsive" id="uploadPreview">
                             <span class="btn btn-default btn-file" style="position: relative; overflow: hidden; ">
                                 選擇圖片上傳
@@ -622,12 +644,12 @@
                     </table>
                     <?php if (isset($this->tickets)): ?>
                         <?php foreach ($this->tickets as $key => $ticket): ?>
-                            <div class="col-cg-6 bg-success" id="<?php echo 'NewTicket_' . $ticket['ticket_id']  ?>" style="display:none;">
-                                <div class="form-group">
-                                    <label>票種</label> <input class="form-control" type="text" id="ticc" name="ticket[<?php echo $ticket['ticket_id']  ?>][ticketName]" placeholder="例如：一般票、學生票" value="<?php echo $ticket['ticketName'] ?>"></div>
-                                <div class="form-group">
-                                    <label>數量</label> <input class="form-control" name="ticket[<?php echo $ticket['ticket_id']  ?>][quantity]" placeholder="票種總和不可多於活動參加人數" value="<?php echo $ticket['quantity'] ?>"> </div>
-                                <div class="form-group"> <label>售價</label> <input class="form-control" name="ticket[<?php echo $ticket['ticket_id']  ?>][price]" placeholder="單張票價" value="<?php echo $ticket['price'] ?>"> </div>
+                            <div class="col-cg-6 bg-success" id="<?php echo 'NewTicket_' . $ticket['ticket_id'] ?>" style="display:none;">
+                                <div class="form-group ticketName_<?php echo $ticket['ticket_id'] ?>">
+                                    <label class="control-label">票種</label> <input class="form-control" type="text" name="ticket[<?php echo $ticket['ticket_id']  ?>][ticketName]" placeholder="例如：一般票、學生票" value="<?php echo $ticket['ticketName'] ?>"></div>
+                                <div class="form-group quantity_<?php echo $ticket['ticket_id'] ?>">
+                                    <label class="control-label">數量</label> <input class="form-control" name="ticket[<?php echo $ticket['ticket_id']  ?>][quantity]" placeholder="票種總和不可多於活動參加人數" value="<?php echo $ticket['quantity'] ?>"> </div>
+                                <div class="form-group price_<?php echo $ticket['ticket_id'] ?>"> <label class="control-label">售價</label> <input class="form-control" name="ticket[<?php echo $ticket['ticket_id']  ?>][price]" placeholder="單張票價" value="<?php echo $ticket['price'] ?>"> </div>
                                 <span id="spanNewTicket">
                                     <span class="saleTimePicker" style="">
                                         <div class="form-group saleTimePicker-start start_sales_<?php echo $ticket['ticket_id'] ?>">
@@ -660,8 +682,9 @@
                             </div>
                         <?php endforeach ?>    
                     <?php endif ?>
+                    <?php /* after establishing events, tickets could not be added */ ?>
                     <?php if (!isset($this->event['url'])): ?>
-                        <div>
+                        <div class="form-group">
                             <button id="newTicket" type="button" class="btn btn-default">新增票種</button>
                         </div>
                     <?php endif ?>
