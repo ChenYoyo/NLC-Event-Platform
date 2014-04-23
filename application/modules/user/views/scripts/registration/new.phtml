@@ -1,6 +1,24 @@
 <!DOCTYPE html>
 <html>
 <?php date_default_timezone_set('Asia/Taipei'); ?>
+<script>
+    $(document).ready(function() {
+        $('select').change(function(event) {
+            var isValid = false;
+            $('select option:selected').each(function(index) {
+                if ($(this).val() > 0) {
+                    isValid = true;
+                };
+            });
+
+            if (isValid) {
+                $('[type=submit]').show();
+            } else{
+                $('[type=submit]').hide();
+            };
+        });
+    });
+</script>
 <body>
     <div class="container">
         <div class="row">
@@ -9,9 +27,9 @@
 
                 </p>
                 <hr>
-                <p>
+                <h3>
                     <span class="glyphicon glyphicon-time"></span><?php echo date("Y-m-d H:i", strtotime($this->event['start_time'])) . '~' . date("Y-m-d H:i", strtotime($this->event['end_time'])) ?>
-                </p>
+                </h3>
                 <hr>
                 <img src="/img/<?php echo $this->baseUrl($this->event['image']) ?>" class="img-responsive">
                 <hr>
@@ -33,9 +51,10 @@
                     	<tbody>
                     		<?php
                     			foreach ($this->tickets as $ticket):
-                    				
+                    				$ticketLeft = $ticket['quantity'] - $ticket['register_num'];
+                                    $ticketMax = (($ticketLeft - $ticket['max_order']) > 0) ? $ticket['max_order'] : $ticketLeft ;
                     				$options = array();
-                    				for ($value=0; $value <= $ticket['max_order'] ; $value++) { 
+                    				for ($value=0; $value <= $ticketMax ; $value++) { 
                     					$options[$value] = $value;
                     				}
                     		?>
@@ -43,13 +62,35 @@
                     				<td><?php echo $ticket['ticketName'] ?></td>
                     				<td><?php echo date("Y-m-d H:i", strtotime($ticket['sale_start'])) . '~' . date("Y-m-d H:i", strtotime($ticket['sale_end'])) ?></td>
                     				<td><?php echo $ticket['price'] ?></td>
-                    				<td><?php echo $this->formSelect('ticket[' . $ticket['ticket_sn'] .']', 0, array('class' => 'form-control'), $options); ?>
-                    				</td>
+                    				<?php if (($ticket['quantity'] - $ticket['register_num']) > 0): ?>
+                                        <td><?php echo $this->formSelect('ticket[' . $ticket['ticket_sn'] .']', 0, array('class' => 'form-control'), $options); ?>
+                                        </td>
+                                    <?php else: ?>
+                                        <td class="text-danger">已售完</td>            
+                                    <?php endif ?>
                     			</tr>
                     		<?php endforeach ?>
                     	</tbody>
                     </table>
-                    <button type="submit" class="btn btn-primary">報名</button>
+                    <div><?php echo $this->formCheckbox('agree', NULL, array('class' => 'agree',
+                                                                            'required' => '',
+                                                                            'id'       => 'checkbox_id'
+                                                                            )) 
+                         ?>
+                        <label for="checkbox_id">我同意<a href="#">服務條款</a>及<a href="#">隱私權政策</a></label>
+                    </div>
+                    <?php if (!$this->isRegistered): ?>
+                    <div class="bg-danger">
+                        <h3>請先登入或是註冊後再做報名</h3>
+                        <div>
+                            <a href="<?php echo $this->formActionUrl('login', 'user', null, null) ?>" class="btn btn-primary active" role="button">登入</a>
+                            <a href="<?php echo $this->formActionUrl('signup', 'user', null, null) ?>" class="btn btn-primary active" role="button">註冊</a>
+                        </div>
+                    </div>
+                    <?php endif ?>
+                    <?php if ($this->isRegistered): ?>
+                        <button type="submit" class="btn btn-primary" style="display:none;">下一步</button>
+                    <?php endif ?>
                 </form>
                 <!-- <div class="well">
                     <h4>Leave a Comment:</h4>

@@ -18,6 +18,7 @@ class Administration_Model_Event extends Zend_Db_Table_Abstract
 						->join('ticket','event.event_sn = ticket.event_fk', array('ticketName' => 'name',
 																								'ticket_sn',
 																								'quantity',
+																								'register_num',
 																								'price',
 																								'sale_start',
 																								'sale_end',

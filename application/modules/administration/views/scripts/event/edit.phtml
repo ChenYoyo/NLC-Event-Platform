@@ -351,8 +351,8 @@
                         '</div>' +
                     '</span>' +
                 '</span>' +
-                '<div class="form-group"> <label>最少訂購數量</label> <select class="form-control" name="ticket[' + id + '][min_order]"> <option>1</option> <option>2</option> <option>3</option> </select> </div>' +
-                '<div class="form-group"> <label>最多訂購數量</label> <select class="form-control" name="ticket[' + id + '][max_order]"> <option>1</option> <option>2</option> <option>3</option> </select> </div>' +
+                //'<div class="form-group"> <label>最少訂購數量</label> <select class="form-control" name="ticket[' + id + '][min_order]"> <option>1</option> <option>2</option> <option>3</option> </select> </div>' +
+                '<div class="form-group"> <label>最多訂購數量</label> <select class="form-control" name="ticket[' + id + '][max_order]"> <option value="1">1</option> <option value="2">2</option> <option value="3">3</option> <option value="4">4</option> <option value="5">5</option> <option value="6">6</option> <option value="7">7</option> <option value="8">8</option> <option value="9">9</option> <option value="10">10</option> </select> </div>' +
                 
                 <?php if (!isset($this->event['url'])): ?>
                 '<button class="btn btn-default AddTicket" id="AddTicket_' + id + '" type="button" class="btn btn-default">新增</button>' +
@@ -675,9 +675,27 @@
                                     </span>
                                 </span>
                                     
-                                <div class="form-group"> <label>最少訂購數量</label> <select class="form-control" name="ticket[<?php echo $ticket['ticket_id']  ?>][min_order]"> <option>1</option> <option>2</option> <option>3</option> </select> </div>
-                                <div class="form-group"> <label>最多訂購數量</label> <select class="form-control" name="ticket[<?php echo $ticket['ticket_id']  ?>][max_order]"> <option>1</option> <option>2</option> <option>3</option> </select> </div>
-                                
+                                <!-- <div class="form-group"> <label>最少訂購數量</label> <select class="form-control" name="ticket[<?php //echo $ticket['ticket_id']  ?>][min_order]"> <option>1</option> <option>2</option> <option>3</option> </select> </div> -->
+                                <div class="form-group"> 
+                                    <label>最多訂購數量</label>
+                                    <?php echo $this->formSelect('ticket[' . $ticket['ticket_id'] . '][max_order]',
+                                                            @$ticket['max_order'],
+                                                            array('class' => 'form-control'),
+                                                            array(
+                                                                1 => '1',
+                                                                2 => '2',
+                                                                3 => '3',
+                                                                4 => '4',                                                                
+                                                                5 => '5',
+                                                                6 => '6',
+                                                                7 => '7',
+                                                                8 => '8',
+                                                                9 => '9',
+                                                                10 => '10',
+                                                            )
+                                                )
+                                    ?>
+                                </div>
                                 <button class="btn btn-default SaveTicket" id="SaveTicket_<?php echo $ticket['ticket_id']  ?>" type="button" style="" class="btn btn-default">存檔</button>
                             </div>
                         <?php endforeach ?>    

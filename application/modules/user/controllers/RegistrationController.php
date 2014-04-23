@@ -28,13 +28,14 @@ class User_RegistrationController extends Zend_Controller_Action
   		$this->view->event = $data[0];
   		$this->view->tickets = $data;
   		$this->view->params = $url;
+        $this->view->isRegistered = Zend_Auth::getInstance()->hasIdentity();
     }
 
     public function purchaseAction()
     {
     	$request = $this->getRequest();
 
-    	if ($request->isPost()) {
+    	if ($request->isPost() && Zend_Auth::getInstance()->hasIdentity()) {
     		
     		$sql = 'SELECT name FROM groups WHERE 1';
 	    	$eventUrl = $request->getParam('event');
@@ -48,7 +49,9 @@ class User_RegistrationController extends Zend_Controller_Action
     		$this->view->orders       = $this->_calOrderPrice($request->getPost());
     		$this->view->user_account = Zend_Auth::getInstance()->getIdentity();
     		$this->view->params       = $eventUrl;
-    	}
+    	} else {
+            $this->redirect('index/index');
+        }
     }
 
     /**
@@ -78,7 +81,7 @@ class User_RegistrationController extends Zend_Controller_Action
     {
     	$request = $this->getRequest();
 
-    	if ($request->isPost()) {
+    	if ($request->isPost() && Zend_Auth::getInstance()->hasIdentity()) {
     		$post = $request->getPost();
 
     		// save post data into "order" table
@@ -91,7 +94,7 @@ class User_RegistrationController extends Zend_Controller_Action
     		if ($isEstablished) {
     			$this->redirect('order/event/id/' . $orderID);
     		} else {
-    			$this->redirect('registration/new');
+    			$this->redirect('registration/new/event/' . $request->getParam('event'));
     		}
     	}
     }
