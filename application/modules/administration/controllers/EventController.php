@@ -6,6 +6,8 @@ class Administration_EventController extends Zend_Controller_Action
 
     protected $_eventModel = null;
 
+    const DEFAULT_UPLOAD_FILE_NAME = '300_300.gif';
+
     /**
      * get default DB resource
      */
@@ -155,7 +157,12 @@ class Administration_EventController extends Zend_Controller_Action
             $data = array();
             
             $data = $this->handleEventData($post);
-            $data['image'] = $this->_uploadPicture();
+            $tempFileName = $this->_uploadPicture();
+
+            // if upload files was not changed from user side, image won't be updated on server
+            if ($tempFileName != self::DEFAULT_UPLOAD_FILE_NAME) {
+                $data['image'] = $tempFileName;
+            }
             
             try {
                 $db->beginTransaction();
@@ -241,7 +248,7 @@ class Administration_EventController extends Zend_Controller_Action
         } else{
             // $messages = $adapter->getMessages();
             // echo implode("\n", $messages);
-            return '300_300.gif';
+            return self::DEFAULT_UPLOAD_FILE_NAME;
         }
     }
 
