@@ -10,7 +10,7 @@
     </thead>
     <?php $orderStatus = Zend_Registry::get('orderStatus'); ?>
     <tbody>
-        <?php foreach ($this->orders as $order): ?>
+        <?php foreach ($this->paginator as $order): ?>
         <tr>
             <td><a href="<?php echo $this->formActionUrl('event', 'order', null, array('id' => $order['order_id'])) ?>">
                 <?php echo $order['event_sn'] ?>
@@ -25,3 +25,12 @@
         <?php endforeach ?>
     </tbody>
 </table>
+<div class="row text-center">
+    <div class="col-lg-12">
+        <ul class="pagination">
+        <?php echo $this->paginationControl($this->paginator,
+                                            'Sliding',
+                                            'common/pagination.phtml'); ?>
+        </ul>
+    </div>
+</div>

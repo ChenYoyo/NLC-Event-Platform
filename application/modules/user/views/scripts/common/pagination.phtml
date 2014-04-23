@@ -1,0 +1,69 @@
+<?php if ($this->pageCount): ?>
+
+<!-- First page link -->
+<?php if (isset($this->previous)): ?>
+  <li>
+    <a href="<?php echo $this->url(array('page' => $this->first)); ?>">
+      &lt; 第一頁
+    </a>
+  </li>
+<?php else: ?>
+  <li>
+    <span class="disabled">&lt; 第一頁</span>
+  </li>
+<?php endif; ?>
+
+<!-- Previous page link -->
+<?php if (isset($this->previous)): ?>
+  <li>
+    <a href="<?php echo $this->url(array('page' => $this->previous)); ?>">
+      &lt; 上一頁
+    </a>
+  </li>
+<?php else: ?>
+  <li>
+    <span class="disabled">&lt; 上一頁</span>
+  </li>
+<?php endif; ?>
+ 
+<!-- Numbered page links -->
+<?php foreach ($this->pagesInRange as $page): ?>
+  <?php if ($page != $this->current): ?>
+    <li>
+      <a href="<?php echo $this->url(array('page' => $page)); ?>">
+          <?php echo $page; ?>
+      </a>
+    </li>
+  <?php else: ?>
+    <li class="active">
+      <a href="#"><?php echo $page; ?></a>
+    </li>
+  <?php endif; ?>
+<?php endforeach; ?>
+ 
+<!-- Next page link -->
+<?php if (isset($this->next)): ?>
+  <li>
+    <a href="<?php echo $this->url(array('page' => $this->next)); ?>">
+      下一頁 &gt;
+    </a>
+  </li>
+<?php else: ?>
+  <li>
+    <span class="disabled">下一頁 &gt;</span>
+  </li>
+<?php endif; ?>
+
+<!-- Last page link -->
+<?php if (isset($this->next)): ?>
+  <li>
+    <a href="<?php echo $this->url(array('page' => $this->last)); ?>">
+      最後一頁 &gt;
+    </a>
+  </li>
+<?php else: ?>
+  <li>
+    <span class="disabled">最後一頁 &gt;</span>
+  </li>
+<?php endif; ?>
+<?php endif; ?>

@@ -30,7 +30,10 @@ class User_OrderController extends Zend_Controller_Action
     public function listAction()
     {
     	$results = $this->getModel()->getOrderList();
-		$this->view->orders = $results;
+        $paginator = Zend_Paginator::factory($results);
+        $paginator->setItemCountPerPage(10);
+        $paginator->setCurrentPageNumber($this->_getParam('page'));
+        $this->view->paginator = $paginator;
     }
 
     public function cancelOrderAjaxAction()

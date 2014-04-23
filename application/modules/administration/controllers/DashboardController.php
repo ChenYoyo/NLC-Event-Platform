@@ -24,7 +24,12 @@ class Administration_DashboardController extends Zend_Controller_Action
     public function listAction()
     {
 		$UserEventModel = new Administration_Model_UserEvent();
-		$this->view->events = $UserEventModel->getHostEventsBySN(Zend_Auth::getInstance()->getIdentity()->user_account_sn);
+		
+        $results = $UserEventModel->getHostEventsBySN(Zend_Auth::getInstance()->getIdentity()->user_account_sn);
+        $paginator = Zend_Paginator::factory($results);
+        $paginator->setItemCountPerPage(10);
+        $paginator->setCurrentPageNumber($this->_getParam('page'));
+        $this->view->paginator = $paginator;
     }
 
     public function publishAction()

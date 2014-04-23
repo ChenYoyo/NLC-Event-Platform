@@ -3,7 +3,9 @@
     <thead>
         <tr>
             <th>活動名稱</th>
-            <th>活動時間</th>
+            <th>票種</th>
+            <th>販售時間</th>
+            <th>報名人數</th>
             <th>活動變更</th>
             <th>上下架</th>
             <th>報名人資料</th>
@@ -11,10 +13,12 @@
     </thead>
    <?php $publishKey = Zend_Registry::get('publishKey'); ?>
     <tbody>
-        <?php foreach ($this->events as $event): ?>
+        <?php foreach ($this->paginator as $event): ?>
         <tr>
             <td><a href="<?php echo $this->formActionUrl('new', 'registration', 'user', array('event' => $event['url'])) ?>"><?php echo $event['name'] ?></a></td>
-            <td><?php echo $event['start_time'] ?>~<?php echo $event['end_time'] ?></td>
+            <td> <?php echo $event['ticketName'] ?></td>
+            <td><?php echo $event['sale_start'] ?>~<?php echo $event['sale_end'] ?></td>
+            <td> <?php echo $event['register_num'] . '/' . $event['quantity'] ?></td>
             <td><a href="<?php echo $this->formActionUrl('edit', 'event', null, array('event' => $event['url'])) ?>">編輯</a></td>
             <td>
                 <div class="btn-group">
@@ -32,3 +36,13 @@
         <?php endforeach ?>
     </tbody>
 </table>
+
+<div class="row text-center">
+    <div class="col-lg-12">
+        <ul class="pagination">
+        <?php echo $this->paginationControl($this->paginator,
+                                            'Sliding',
+                                            'common/pagination.phtml'); ?>
+        </ul>
+    </div>
+</div>
